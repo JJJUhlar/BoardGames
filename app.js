@@ -7,9 +7,9 @@ const app = express()
 // add app.use json here
 
 app.get("/api/categories", (request, response, next) => {
-    return db.query('SELECT * FROM categories')
+    return db.query('SELECT * FROM categories;')
         .then(({rows}) => {
-            console.log(rows)
+            
             return rows
         })
         .then((categories) => {
@@ -26,9 +26,14 @@ app.get("/api/categories", (request, response, next) => {
 
 // error handlers
 app.use((err,request,response,next) => {
-    console.log("error >>>", err)
-    next(err)
+    console.log(err, "Caught an error")
+    if(err.status === 404) {
+        response.status(404).send({msg: "not found"})
+    } else {
+        response.status(err.status).send({msg: err.status})
+    }    
 })
+
 
 
 module.exports = app;

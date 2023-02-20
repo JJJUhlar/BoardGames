@@ -21,12 +21,12 @@ describe('appTests', () => {
         console.log(">>> /api/categories tests <<<")
         
         test('endpoint has 200 status', () => {
-            request(app)
+            return request(app)
                 .get('/api/categories')
                 .expect(200)
         })
         test('returns an array of category objects', () => {
-            request(app)
+            return request(app)
                 .get('/api/categories')
                 .expect(200)
                 .then(({body}) => {
@@ -36,7 +36,7 @@ describe('appTests', () => {
                 })
         })
         test('category objects have slug, description properties', () => {
-            request(app)
+            return request(app)
                 .get('/api/categories')
                 .expect(200)
                 .then(({body}) => {
@@ -49,18 +49,24 @@ describe('appTests', () => {
                     })
                 })
         })
-        console.log("<<< end of test block >>>")
     })
 
     describe('errors', () => {
+        console.log(">>> error handling tests <<<")
+
         test('responds 404 to non existent endpoint', () => {
-            request(app)
+            return request(app)
                 .get('/api/notanexistingendpoint')
                 .expect(404)
         })
         test('repsonds with an appropriate error message', () => {
-            request(app)
-                
+            return request(app)
+                .get('/api/notanexistingendpoint')
+                .expect(404)
+                .then(({body})=>{
+                    console.log(body, "<<<<")
+                    expect(body.msg).toBe('not found')
+                })
         })
     })
 })
