@@ -1,25 +1,13 @@
 const express = require('express')
 const db = require('./db/connection')
 // require controllers
+const {getCategories} = require('./_controllers/controllers')
 
 
 const app = express()
 // add app.use json here
 
-app.get("/api/categories", (request, response, next) => {
-    return db.query('SELECT * FROM categories;')
-        .then(({rows}) => {
-            
-            return rows
-        })
-        .then((categories) => {
-            response.status(200).send({"categories":categories})
-        })
-        .catch((error)=>{
-            next(error)
-        })
-
-})
+app.get("/api/categories", getCategories)
 
 // end points here to come
 

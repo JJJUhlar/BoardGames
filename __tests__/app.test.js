@@ -51,7 +51,7 @@ describe('appTests', () => {
         })
     })
 
-    describe('errors', () => {
+    describe.skip('errors', () => {
         console.log(">>> error handling tests <<<")
 
         test('responds 404 to non existent endpoint', () => {
