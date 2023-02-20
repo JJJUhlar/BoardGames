@@ -12,7 +12,7 @@ beforeEach(()=>{
 
 // stop jest from hanging
 afterAll(()=>{
-    db.end()
+    return db.end()
 })
 
 
@@ -51,7 +51,7 @@ describe('appTests', () => {
         })
     })
 
-    describe.skip('errors', () => {
+    describe('errors', () => {
         console.log(">>> error handling tests <<<")
 
         test('responds 404 to non existent endpoint', () => {
@@ -63,9 +63,10 @@ describe('appTests', () => {
             return request(app)
                 .get('/api/notanexistingendpoint')
                 .expect(404)
-                .then(({body})=>{
-                    console.log(body, "<<<<")
-                    expect(body.msg).toBe('not found')
+                .then(({body}) => {
+                    console.log(body.msg)
+                    console.log(body, "<<<<<")
+                    expect(body.msg).toBe('Not Found')
                 })
         })
     })

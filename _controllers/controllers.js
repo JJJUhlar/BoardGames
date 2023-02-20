@@ -7,6 +7,6 @@ exports.getCategories = (request, response, next) => {
             response.status(200).send({"categories":categories})
         })
         .catch((error)=>{
-            next(error)
+            response.send(error)
         })
 }
