@@ -3,6 +3,7 @@ const db = require('../db/connection')
 const request = require('supertest')
 const seed = require('../db/seeds/seed')
 const data = require('../db/data/test-data')
+const reviews = require('../db/data/test-data/reviews')
 
 
 // supertest re-seed database between tests
@@ -44,30 +45,100 @@ describe('appTests', () => {
                     categories.forEach((category)=>{
                         expect(Object.keys(category).length).toBe(2)
 
-                        expect(category).toHaveProperty('slug', expect.any(String))
-                        expect(category).toHaveProperty('description', expect.any(String))
+                        expect(category).toHaveProperty('slug', expect.any(String));
+                        expect(category).toHaveProperty('description', expect.any(String));
                     })
                 })
+        })
+    })
+
+    describe('GET: /api/reviews', () => {
+        console.log(">>> /api/reviews tests <<<")
+        test('endpoint status 200', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+        })
+        test('returns an array', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    
+                    expect(Array.isArray(body.reviews)).toBe(true)
+                })
+        })
+        test('returns an array of review objects', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
+                })
+        })
+        test('should have 9 length', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    expect(Object.keys(body.reviews[0]).length).toBe(9)
+                })
+        })
+        test('objects should have correct properties', () => {
+            return request(app)
+                .get("/api/reviews")
+                .expect(200)
+                .then(({body})=>{
+                    body.reviews.forEach(review => {
+                        expect(review).toHaveProperty("owner", expect.any(String))
+                        expect(review).toHaveProperty("title", expect.any(String))
+                        expect(review).toHaveProperty("review_id", expect.any(Number))
+                        expect(review).toHaveProperty("category", expect.any(String))
+                        expect(review).toHaveProperty("review_img_url", expect.any(String))
+                        expect(review).toHaveProperty("created_at", expect.any(String))
+                        expect(review).toHaveProperty("votes", expect.any(Number))
+                        expect(review).toHaveProperty("designer", expect.any(String))
+                        expect(review).toHaveProperty("comment_count", expect.any(Number))
+                    });
+                })
+        })
+        test('return objects should be sorted by date in descending order', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    const reviewDates = body.reviews.map((review)=>{
+                        const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
+                    
+                        return parseInt(date,10)
+                    });
+
+                    for (let i = 1; i < reviewDates.length; i++) {
+                        expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
+                    }
+                })
+
         })
     })
 
     describe('errors', () => {
         console.log(">>> error handling tests <<<")
 
-        test('responds 404 to non existent endpoint', () => {
-            return request(app)
-                .get('/api/notanexistingendpoint')
-                .expect(404)
+        describe('404 errors', () => {
+            test('responds 404 to non existent path', () => {
+                return request(app)
+                    .get('/api/notanexistingendpoint')
+                    .expect(404)
+            })
+            test('404 response has an appropriate error message', () => {
+                return request(app)
+                    .get('/api/notanexistingendpoint')
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Not found! :'( ")
+                    })
+            })
         })
-        test('repsonds with an appropriate error message', () => {
-            return request(app)
-                .get('/api/notanexistingendpoint')
-                .expect(404)
-                .then(({body}) => {
-                    console.log(body.msg)
-                    console.log(body, "<<<<<")
-                    expect(body.msg).toBe('Not Found')
-                })
-        })
+        
     })
 })

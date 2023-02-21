@@ -1,23 +1,28 @@
 const express = require('express')
 const db = require('./db/connection')
 // require controllers
-const {getCategories} = require('./_controllers/controllers')
-const {handle404s, handle500s} = require('./_controllers/errorHandlingcontrollers')
+const {getCategories, getReviews} = require('./_controllers/controllers')
+const {handle404noPaths, handle400s, handle500s} = require('./_controllers/errorHandlingcontrollers')
 
+// server
 const app = express()
+
+
 // add app.use json here
 
-app.use(express.json())
 
+// end points
 app.get("/api/categories", getCategories)
-
-// end points here to come
+app.get("/api/reviews", getReviews)
 
 
 // error handlers
-app.use(handle404s);
-
+app.use(handle404noPaths)
+// app.use(handle400s);
 app.use(handle500s);
+
+// custom errors
+
 
 
 module.exports = app;
