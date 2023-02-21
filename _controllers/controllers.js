@@ -1,6 +1,7 @@
 const {
     selectCategories,
-    selectReviewsWithComCounts
+    selectReviewsWithComCounts,
+    selectReviewByID
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -22,4 +23,18 @@ exports.getReviews = (req,res,next) => {
             next(err);
         })
         
+}
+
+exports.getReviewByID = (req, res, next) => {
+    const { review_id } = req.params;
+    console.log(review_id);
+
+    return selectReviewByID(review_id)
+        .then((result)=>{
+            res.status(200).send({"review": result});
+        })
+        .catch((err)=>{
+            next(err);
+        })
+
 }
