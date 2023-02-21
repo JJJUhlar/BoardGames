@@ -18,6 +18,10 @@ exports.selectReviewsWithComCounts = () => {
                     `)
         .then(({rows})=>{
             // console.log(">>> selected reviews >>>", rows)
+            rows.forEach((row)=>{
+                row.comment_count = parseInt(row.comment_count)
+            })
+            console.log(rows)
             return rows
         })
 }

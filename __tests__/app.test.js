@@ -45,14 +45,14 @@ describe('appTests', () => {
                     categories.forEach((category)=>{
                         expect(Object.keys(category).length).toBe(2)
 
-                        expect(category.toHaveProperty('slug', expect.any(String))).toBe(true)
-                        expect(category.toHaveProperty('description', expect.any(String))).toBe(true)
+                        expect(category).toHaveProperty('slug', expect.any(String));
+                        expect(category).toHaveProperty('description', expect.any(String));
                     })
                 })
         })
     })
 
-    describe.only('GET: /api/reviews', () => {
+    describe('GET: /api/reviews', () => {
         console.log(">>> /api/reviews tests <<<")
         test('endpoint status 200', () => {
             return request(app)
@@ -90,15 +90,15 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     body.reviews.forEach(review => {
-                        expect(review.hasOwnProperty("owner", expect.any(String))).toBe(true)
-                        expect(review.hasOwnProperty("title", expect.any(String))).toBe(true)
-                        expect(review.hasOwnProperty("review_id", expect.any(Number))).toBe(true)
-                        expect(review.hasOwnProperty("category", expect.any(String))).toBe(true)
-                        expect(review.hasOwnProperty("review_img_url", expect.any(String))).toBe(true)
-                        expect(review.hasOwnProperty("created_at", expect.any(Number))).toBe(true)
-                        expect(review.hasOwnProperty("votes", expect.any(Number))).toBe(true)
-                        expect(review.hasOwnProperty("designer", expect.any(String))).toBe(true)
-                        expect(review.hasOwnProperty("comment_count", expect.any(Number))).toBe(true)
+                        expect(review).toHaveProperty("owner", expect.any(String))
+                        expect(review).toHaveProperty("title", expect.any(String))
+                        expect(review).toHaveProperty("review_id", expect.any(Number))
+                        expect(review).toHaveProperty("category", expect.any(String))
+                        expect(review).toHaveProperty("review_img_url", expect.any(String))
+                        expect(review).toHaveProperty("created_at", expect.any(String))
+                        expect(review).toHaveProperty("votes", expect.any(Number))
+                        expect(review).toHaveProperty("designer", expect.any(String))
+                        expect(review).toHaveProperty("comment_count", expect.any(Number))
                     });
                 })
         })
@@ -124,20 +124,21 @@ describe('appTests', () => {
     describe('errors', () => {
         console.log(">>> error handling tests <<<")
 
-        test('responds 404 to non existent endpoint', () => {
-            return request(app)
-                .get('/api/notanexistingendpoint')
-                .expect(404)
+        describe('404 errors', () => {
+            test('responds 404 to non existent path', () => {
+                return request(app)
+                    .get('/api/notanexistingendpoint')
+                    .expect(404)
+            })
+            test('404 response has an appropriate error message', () => {
+                return request(app)
+                    .get('/api/notanexistingendpoint')
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.msg).toBe("Not found! :'( ")
+                    })
+            })
         })
-        test('repsonds with an appropriate error message', () => {
-            return request(app)
-                .get('/api/notanexistingendpoint')
-                .expect(404)
-                .then(({body}) => {
-                    console.log(body.msg)
-                    console.log(body, "<<<<<")
-                    expect(body.msg).toBe('Not Found')
-                })
-        })
+        
     })
 })

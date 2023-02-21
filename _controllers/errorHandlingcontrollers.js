@@ -1,12 +1,15 @@
-
-exports.handle404s = (err,req,res,next) => {
-    console.log(err, "Caught an error")
-    if(err.status === 404) {
-        return res.status(404).send({msg: "Not Found"})
-    } else {
-        next(err)
-    }           
+exports.handle404noPaths = (req, res, next) => {
+    res.status(404).send({msg: "Not found! :'( "})
 }
+
+// exports.handle400s = (err,req,res,next) => {
+//     console.log(err, "Caught an error")
+//     if(err.status === 404) {
+//         return res.status(404).send({msg: "Not Found"})
+//     } else {
+//         next(err)
+//     }           
+// }
 
 exports.handle500s = (err,req,res,next) => {
     console.log(err.status, "<<< 500 error handler")
@@ -16,3 +19,5 @@ exports.handle500s = (err,req,res,next) => {
 };
 
 //  psql error handler
+
+// not an id/bad request
