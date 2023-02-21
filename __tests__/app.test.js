@@ -93,6 +93,25 @@ describe('appTests', () => {
                 })
         })
     })
+
+    describe('POST', () => {
+        test('POST: /api/reviews/:review_id/comments', () => {
+            const body = {
+                "username": "joseph",
+                "body": "I think this test game is amazing"
+            }
+
+            return request(app)
+                .post('api/reviews/1/comments', body)
+                .expect(201) // 'created'
+                .then(({body})=>{
+                    expect(body.msg).toEqual({
+                        "username": "joseph",
+                        "body": "I think this test game is amazing"
+                    })
+                })
+        })
+    })
     
     describe('errors', () => {
         test('responds 404 to non existent path', () => {
