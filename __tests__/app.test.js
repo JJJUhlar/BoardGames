@@ -16,30 +16,7 @@ afterAll(()=>{
 })
 
 describe('appTests', () => {
-    test('GET: 200 /api/reviews/:review_id/comments', () => {
-        return request(app)
-            .get('/api/reviews/3/comments')
-            .expect(200)
-            .then(({body})=>{
-                const comments = body.reviewComments;
-                expect(Array.isArray(comments)).toBe(true)
-                expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
-
-                comments.forEach((comment)=>{
-                    expect(Object.keys(comment).length).toBe(6)
-                    expect(comment).toHaveProperty('comment_id', expect.any(Number))
-                    expect(comment).toHaveProperty('votes', expect.any(Number))
-                    expect(comment).toHaveProperty('created_at', expect.any(String))
-                    expect(comment).toHaveProperty('author', expect.any(String))
-                    expect(comment).toHaveProperty('body', expect.any(String))
-                    expect(comment).toHaveProperty('review_id', expect.any(Number))
-                })
-                // should return in descending order (most recent first)
-                for (let i = 1; i < comments.length; i++) {
-                    expect(Date.parse(comments[i-1].created_at) > Date.parse(comments[i].created_at)).toBe(true)
-                }
-            })
-    })
+   
 
     describe('GET: /api/categories', () => {        
         test('GET: 200 /api/categories', () => {
@@ -117,6 +94,31 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
         })
+        test('GET: 200 /api/reviews/:review_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/3/comments')
+                .expect(200)
+                .then(({body})=>{
+                    const comments = body.reviewComments;
+                    expect(Array.isArray(comments)).toBe(true)
+                    expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
+    
+                    comments.forEach((comment)=>{
+                        expect(Object.keys(comment).length).toBe(6)
+                        expect(comment).toHaveProperty('comment_id', expect.any(Number))
+                        expect(comment).toHaveProperty('votes', expect.any(Number))
+                        expect(comment).toHaveProperty('created_at', expect.any(String))
+                        expect(comment).toHaveProperty('author', expect.any(String))
+                        expect(comment).toHaveProperty('body', expect.any(String))
+                        expect(comment).toHaveProperty('review_id', expect.any(Number))
+                    })
+                    // should return in descending order (most recent first)
+                    for (let i = 1; i < comments.length; i++) {
+                        expect(Date.parse(comments[i-1].created_at) > Date.parse(comments[i].created_at)).toBe(true)
+                    }
+                })
+        })
+        
     })
     
     describe('errors', () => {
@@ -137,5 +139,6 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
+
     })
 })
