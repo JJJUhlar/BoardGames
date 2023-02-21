@@ -21,7 +21,6 @@ exports.selectReviewsWithComCounts = () => {
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)
             })
-            console.log(rows)
             return rows
         })
 }
