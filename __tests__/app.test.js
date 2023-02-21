@@ -5,7 +5,6 @@ const seed = require('../db/seeds/seed')
 const data = require('../db/data/test-data')
 const reviews = require('../db/data/test-data/reviews')
 
-
 // supertest re-seed database between tests
 beforeEach(()=>{
     return seed(data)
@@ -15,7 +14,6 @@ beforeEach(()=>{
 afterAll(()=>{
     return db.end()
 })
-
 
 describe('appTests', () => {
     describe('GET: /api/categories', () => {        
@@ -69,7 +67,6 @@ describe('appTests', () => {
                     expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
                     }
                 
-                
                 });
             })
     
@@ -93,9 +90,7 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('category', expect.any(String))
                     expect(review).toHaveProperty('owner', expect.any(String))
                     expect(review).toHaveProperty('created_at', expect.any(String))
-
                 })
-
         })
     })
     
@@ -108,7 +103,14 @@ describe('appTests', () => {
                     expect(body.msg).toBe("Not found! :'( ")
                 })
         })
-        test.todo('400 bad request for reviews_id endpoint / psql error?')
+        test('responds 400 for bad review_id', () =>{
+            return request(app)
+                .get('/api/reviews/notanid')
+                .expect(400)
+                .then(({body})=>{
 
+                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                })
+        })
     })
 })
