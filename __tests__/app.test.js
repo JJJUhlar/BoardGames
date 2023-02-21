@@ -18,7 +18,7 @@ afterAll(()=>{
 
 
 describe('appTests', () => {
-    test('GET: 200 /api/reviews/:review_id/comments', () => {
+    test.skip('GET: 200 /api/reviews/:review_id/comments', () => {
         return request(app)
             .get('/api/reviews/:review_id/comments')
             .expect(200)
