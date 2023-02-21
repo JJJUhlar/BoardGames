@@ -19,12 +19,7 @@ afterAll(()=>{
 
 describe('appTests', () => {
     describe('GET: /api/categories', () => {        
-        test('endpoint has 200 status', () => {
-            return request(app)
-                .get('/api/categories')
-                .expect(200)
-        })
-        test('returns an array of category objects', () => {
+        test('GET: 200 /api/categories', () => {
             return request(app)
                 .get('/api/categories')
                 .expect(200)
@@ -32,14 +27,7 @@ describe('appTests', () => {
                     const {categories} = body;
 
                     expect(Array.isArray(categories)).toBe(true)
-                })
-        })
-        test('category objects have slug, description properties', () => {
-            return request(app)
-                .get('/api/categories')
-                .expect(200)
-                .then(({body}) => {
-                    const {categories} = body;
+
                     categories.forEach((category)=>{
                         expect(Object.keys(category).length).toBe(2)
 
@@ -91,9 +79,12 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
+                    console.log(review)
+                    
+                    expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
-                    expect(Object.keys(review)).toBe(9)
-                    expect(review).toHaveProperty('review_id', expect.any(String))
+                    expect(Object.keys(review).length).toBe(9)
+                    expect(review).toHaveProperty('review_id', expect.any(Number))
                     expect(review).toHaveProperty('title', expect.any(String))
                     expect(review).toHaveProperty('review_body', expect.any(String))
                     expect(review).toHaveProperty('designer', expect.any(String))
@@ -116,6 +107,8 @@ describe('appTests', () => {
                 .then(({body}) => {
                     expect(body.msg).toBe("Not found! :'( ")
                 })
-        })     
+        })
+        test.todo('400 bad request for reviews_id endpoint / psql error?')
+
     })
 })
