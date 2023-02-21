@@ -18,6 +18,30 @@ afterAll(()=>{
 
 
 describe('appTests', () => {
+    test('GET: 200 /api/reviews/:review_id/comments', () => {
+        return request(app)
+            .get('/api/reviews/:review_id/comments')
+            .expect(200)
+            .then(({body})=>{
+                const comments = body.reviewComments;
+
+                expect(Array.isArray(comments)).toBe(true)
+                expect(Object.prototype.toString.call(comments[0]).toBe('[object Object]'))
+
+                comments.forEach((comment)=>{
+                    expect(Object.keys(comment).length).toBe(6)
+                    expect(comment).toHaveProperty('comment_id', expect.any(String))
+                    expect(comment).toHaveProperty('votes')
+                    expect(comment).toHaveProperty('created_at')
+                    expect(comment).toHaveProperty('author')
+                    expect(comment).toHaveProperty('body')
+                    expect(comment).toHaveProperty('review_id')
+                })
+
+                expect()
+            })
+    })
+
     describe('GET: /api/categories', () => {
         console.log(">>> /api/categories tests <<<")
         

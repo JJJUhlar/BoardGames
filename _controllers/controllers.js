@@ -1,6 +1,7 @@
 const {
     selectCategories,
-    selectReviewsWithComCounts
+    selectReviewsWithComCounts,
+    selectReviewCommentsByID
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -22,4 +23,8 @@ exports.getReviews = (req,res,next) => {
             next(err);
         })
         
+}
+
+exports.getReviewCommentsByID = (req,res,next) => {
+    
 }
