@@ -21,11 +21,18 @@ exports.selectReviewsWithComCounts = () => {
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)
             })
-            console.log(rows)
             return rows
         })
 }
 
 exports.selectReviewCommentsByID = (id) => {
-    
+    return db.query(`
+                    SELECT *
+                    FROM comments
+                    WHERE review_id = $1
+                    ORDER BY created_at DESC;
+                    `, [id])
+        .then(({rows})=>{
+            return rows
+        })
 }

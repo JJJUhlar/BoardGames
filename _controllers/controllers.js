@@ -26,5 +26,13 @@ exports.getReviews = (req,res,next) => {
 }
 
 exports.getReviewCommentsByID = (req,res,next) => {
-    
+    const { review_id } = req.params;
+
+    return selectReviewCommentsByID(review_id)
+        .then((result) => {
+            res.status(200).send({"reviewComments": result})
+        })
+        .catch((err)=>{
+            next(err);
+        })
 }
