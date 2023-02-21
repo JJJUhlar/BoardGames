@@ -10,3 +10,20 @@ exports.getCategories = (request, response, next) => {
             response.send(error)
         })
 }
+
+exports.getReviews = (req,res,next) => {
+    return db.query(`   SELECT * FROM reviews
+                        ORDER BY created_at
+                        RETURNING *;`)
+        .then(({rows})=>{
+            console.log(">>> reviews >>>", rows)
+            return rows
+        })
+        .then((reviews)=>{
+            res.status(200).send({"reviews": reviews})
+        })
+        .catch((err)=>{
+            next(err);
+        })
+        
+}
