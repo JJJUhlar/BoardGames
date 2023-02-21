@@ -7,7 +7,7 @@ const {handle404s, handle500s} = require('./_controllers/errorHandlingcontroller
 const app = express()
 // add app.use json here
 
-app.use(express.json())
+
 
 app.get("/api/categories", getCategories)
 

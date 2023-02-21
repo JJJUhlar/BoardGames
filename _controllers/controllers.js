@@ -1,5 +1,7 @@
-
-const {selectCategories} = require('../_models/models')
+const {
+    selectCategories,
+    selectReviewsWithComCounts
+} = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
     return selectCategories()
@@ -12,13 +14,7 @@ exports.getCategories = (request, response, next) => {
 }
 
 exports.getReviews = (req,res,next) => {
-    return db.query(`   SELECT * FROM reviews
-                        ORDER BY created_at
-                        RETURNING *;`)
-        .then(({rows})=>{
-            console.log(">>> reviews >>>", rows)
-            return rows
-        })
+    return selectReviewsWithComCounts()
         .then((reviews)=>{
             res.status(200).send({"reviews": reviews})
         })

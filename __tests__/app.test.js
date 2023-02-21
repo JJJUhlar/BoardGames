@@ -3,6 +3,7 @@ const db = require('../db/connection')
 const request = require('supertest')
 const seed = require('../db/seeds/seed')
 const data = require('../db/data/test-data')
+const reviews = require('../db/data/test-data/reviews')
 
 
 // supertest re-seed database between tests
@@ -44,14 +45,15 @@ describe('appTests', () => {
                     categories.forEach((category)=>{
                         expect(Object.keys(category).length).toBe(2)
 
-                        expect(category).toHaveProperty('slug', expect.any(String))
-                        expect(category).toHaveProperty('description', expect.any(String))
+                        expect(category.toHaveProperty('slug', expect.any(String))).toBe(true)
+                        expect(category.toHaveProperty('description', expect.any(String))).toBe(true)
                     })
                 })
         })
     })
 
-    describe('GET: /api/reviews', () => {
+    describe.only('GET: /api/reviews', () => {
+        console.log(">>> /api/reviews tests <<<")
         test('endpoint status 200', () => {
             return request(app)
                 .get('/api/reviews')
@@ -61,45 +63,62 @@ describe('appTests', () => {
             return request(app)
                 .get('/api/reviews')
                 .expect(200)
-                .then(({reviews})=>{
-                    expect(Array.isArray(reviews)).toBe(true)
+                .then(({body})=>{
+                    
+                    expect(Array.isArray(body.reviews)).toBe(true)
                 })
         })
         test('returns an array of review objects', () => {
             return request(app)
                 .get('/api/reviews')
                 .expect(200)
-                .then(({reviews})=>{
-                    expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object')
+                .then(({body})=>{
+                    expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
                 })
         })
         test('should have 9 length', () => {
             return request(app)
                 .get('/api/reviews')
                 .expect(200)
-                .then(({reviews})=>{
-                    expect(Object.keys(reviews).length).toBe(9)
+                .then(({body})=>{
+                    expect(Object.keys(body.reviews[0]).length).toBe(9)
                 })
         })
         test('objects should have correct properties', () => {
             return request(app)
                 .get("/api/reviews")
                 .expect(200)
-                .then(({reviews})=>{
-                    reviews.forEach(review => {
-                        expect(review).hasOwnProperty("owner", expect.any(String))
-                        expect(review).hasOwnProperty("title", expect.any(String))
-                        expect(review).hasOwnProperty("review_id", expect.any(Number))
-                        expect(review).hasOwnProperty("category", expect.any(String))
-                        expect(review).hasOwnProperty("review_img_url", expect.any(String))
-                        expect(review).hasOwnProperty("created_at", expect.any(Number))
-                        expect(review).hasOwnProperty("votes", expect.any(Number))
-                        expect(review).hasOwnProperty("designer", expect.any(String))
-                        expect(review).hasOwnProperty("comment_count", expect.any(Number))
+                .then(({body})=>{
+                    body.reviews.forEach(review => {
+                        expect(review.hasOwnProperty("owner", expect.any(String))).toBe(true)
+                        expect(review.hasOwnProperty("title", expect.any(String))).toBe(true)
+                        expect(review.hasOwnProperty("review_id", expect.any(Number))).toBe(true)
+                        expect(review.hasOwnProperty("category", expect.any(String))).toBe(true)
+                        expect(review.hasOwnProperty("review_img_url", expect.any(String))).toBe(true)
+                        expect(review.hasOwnProperty("created_at", expect.any(Number))).toBe(true)
+                        expect(review.hasOwnProperty("votes", expect.any(Number))).toBe(true)
+                        expect(review.hasOwnProperty("designer", expect.any(String))).toBe(true)
+                        expect(review.hasOwnProperty("comment_count", expect.any(Number))).toBe(true)
                     });
                 })
         })
-        test.todo('return objects should be sorted by date in descending order')
+        test('return objects should be sorted by date in descending order', () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    const reviewDates = body.reviews.map((review)=>{
+                        const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
+                    
+                        return parseInt(date,10)
+                    });
+
+                    for (let i = 1; i < reviewDates.length; i++) {
+                        expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
+                    }
+                })
+
+        })
     })
 
     describe('errors', () => {
