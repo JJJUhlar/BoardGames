@@ -3,7 +3,9 @@ const {
     selectReviewsWithComCounts,
     selectReviewByID,
     selectReviewCommentsByID,
-    checkReviewExists
+    checkReviewExists,
+    insertCommentToReviewByID,
+    checkUserExists
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -50,4 +52,28 @@ exports.getReviewCommentsByID = (req,res,next) => {
         .catch((err)=>{
             next(err);
         })
+}
+
+exports.postCommentToReviewByID = (req,res,next) => {
+    const { review_id } = req.params
+    console.log(req.body, "<<<< should be req.body")
+    const { username, body } = req.body
+    console.log(username, body, "<<< should be post username + body")
+
+    // check review exists 
+    // check user exists
+
+    const check_user_exists_promise = checkUserExists(username)
+    const review_id_check_promise = checkReviewExists(review_id)
+    const insert_post_promise = insertCommentToReviewByID(review_id, username, body)
+
+    Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
+        .then((result) => {
+            console.log(result[0], "<<<< should be posted comment")
+            res.status(201).send({"postedComment": result[0]})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+    
 }

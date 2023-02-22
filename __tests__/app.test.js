@@ -129,21 +129,34 @@ describe('appTests', () => {
             })
     })
 
-    describe.skip('POST', () => {
+    describe('POST', () => {
         test('POST: /api/reviews/:review_id/comments', () => {
             const body = {
-                "username": "joseph",
-                "body": "I think this test game is amazing"
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
             }
 
             return request(app)
-                .post('api/reviews/1/comments', body)
+                .post('/api/reviews/1/comments')
+                .send(body)
                 .expect(201) // 'created'
                 .then(({body})=>{
-                    expect(body.msg).toEqual({
-                        "username": "joseph",
-                        "body": "I think this test game is amazing"
-                    })
+                    console.log(body.postedComment)
+                    const post = body.postedComment;
+
+                    expect(Object.prototype.toString.call(post)).toBe('[object Object]')
+                    expect(Object.keys(post).length).toBe(6)
+                    
+                    expect(post).toHaveProperty("comment_id", expect.any(Number))
+                    expect(post).toHaveProperty("body", expect.any(String))
+                    expect(post).toHaveProperty("review_id", expect.any(Number))
+                    expect(post).toHaveProperty("author", expect.any(String))
+                    expect(post).toHaveProperty("votes", expect.any(Number))
+                    expect(post).toHaveProperty("created_at", expect.any(String))
+
+                    expect(post.author).toBe("bainesface")
+                    expect(post.body).toBe("I think this test game is amazing")
+
                 })
         })
         test.todo('Rejects an invalid comment post (wrong properties or value types)')

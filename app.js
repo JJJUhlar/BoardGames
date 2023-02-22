@@ -6,7 +6,8 @@ const {
     getCategories,
     getReviews,
     getReviewByID,
-    getReviewCommentsByID
+    getReviewCommentsByID,
+    postCommentToReviewByID
 } = require('./_controllers/controllers')
 const {
     handle404noPaths,
@@ -26,6 +27,8 @@ app.get("/api/categories", getCategories)
 app.get("/api/reviews", getReviews)
 app.get("/api/reviews/:review_id", getReviewByID)
 app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
+
+app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 
 // error handlers
 app.use(handle404noPaths)
