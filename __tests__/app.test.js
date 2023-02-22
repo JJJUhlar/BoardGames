@@ -111,6 +111,9 @@ describe('appTests', () => {
                     })
                 })
         })
+        test.todo('Rejects an invalid comment post (wrong properties or value types)')
+        test.todo('Rejects a valid post to bad route ')
+        test.todo('Rejects a valid post, to a well formed, but non-existant review')
     })
     
     describe('errors', () => {

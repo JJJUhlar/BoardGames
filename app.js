@@ -9,7 +9,7 @@ const app = express()
 
 
 // add app.use json here
-
+app.use(express.json())
 
 // end points
 app.get("/api/categories", getCategories)
