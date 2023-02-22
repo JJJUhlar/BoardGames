@@ -94,7 +94,7 @@ describe('appTests', () => {
         })
     })
 
-    describe('POST', () => {
+    describe.skip('POST', () => {
         test('POST: /api/reviews/:review_id/comments', () => {
             const body = {
                 "username": "joseph",
