@@ -16,6 +16,8 @@ afterAll(()=>{
 })
 
 describe('appTests', () => {
+   
+
     describe('GET: /api/categories', () => {        
         test('GET: 200 /api/categories', () => {
             return request(app)
@@ -76,7 +78,6 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
-                    console.log(review)
                     
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
@@ -92,6 +93,40 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
         })
+        test('GET: 200 /api/reviews/:review_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/3/comments')
+                .expect(200)
+                .then(({body})=>{
+                    const comments = body.reviewComments;
+                    expect(Array.isArray(comments)).toBe(true)
+                    expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
+    
+                    comments.forEach((comment)=>{
+                        expect(Object.keys(comment).length).toBe(6)
+                        expect(comment).toHaveProperty('comment_id', expect.any(Number))
+                        expect(comment).toHaveProperty('votes', expect.any(Number))
+                        expect(comment).toHaveProperty('created_at', expect.any(String))
+                        expect(comment).toHaveProperty('author', expect.any(String))
+                        expect(comment).toHaveProperty('body', expect.any(String))
+                        expect(comment).toHaveProperty('review_id', expect.any(Number))
+                    })
+                    // should return in descending order (most recent first)
+                    for (let i = 1; i < comments.length; i++) {
+                        expect(Date.parse(comments[i-1].created_at) > Date.parse(comments[i].created_at)).toBe(true)
+                    }
+                })
+        })
+            test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
+                return request(app)
+                    .get('/api/reviews/5/comments')
+                    .expect(200)
+                    .then(({body})=>{
+                        const comments = body.reviewComments;
+                        expect(Array.isArray(comments)).toBe(true)
+                        expect(comments.length).toBe(0)
+                    })
+            })
     })
     
     describe('errors', () => {
@@ -112,5 +147,32 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
+        
+        test('GET: 404 /api/reviews/:review_id/notaroute ', () => {
+            return request(app)
+                .get('/api/reviews/3/bananapancakes')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe("Not found! :'( ")
+                })
+        })
+        test('GET: 400 /api/reviews/:bad_review_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/magicErrorThrowingCatapult/comments')
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                })
+        })
+        test('GET: 404 /api/reviews/:well_formed_but_non_existant_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/99999990/comments')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('No review found for this ID: 99999990')
+                })
+        })
+            // /api/reviews/review_id/comments 
+        
     })
 })

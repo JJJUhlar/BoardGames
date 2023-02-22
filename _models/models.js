@@ -25,6 +25,37 @@ exports.selectReviewsWithComCounts = () => {
         })
 }
 
+exports.checkReviewExists = (id) => {
+   return db.query(`
+                SELECT *
+                FROM reviews
+                WHERE review_id = $1;
+                `, [id])
+            .then(({rows})=>{
+                const review = rows[0]
+                if (!review) {
+                    return Promise.reject({
+                        status: 404,
+                        msg: `No review found for this ID: ${id}`
+                    })
+                } else {
+                    return id
+                }
+            })
+}
+
+exports.selectReviewCommentsByID = (id) => {
+    return db.query(`
+                    SELECT *
+                    FROM comments
+                    WHERE review_id = $1
+                    ORDER BY created_at DESC;
+                    `, [id])
+        .then(({rows})=>{
+            return rows
+        })
+    }
+
 exports.selectReviewByID = (id) => {
     return db.query(`
                     SELECT review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at
