@@ -10,8 +10,8 @@ const {
 } = require('./_controllers/controllers')
 const {
     handle404noPaths,
-    handle400BadId,
-    handle500s
+    handle500s,
+    handleCustomErrors
 } = require('./_controllers/errorHandlingcontrollers')
 
 // server
@@ -25,12 +25,11 @@ const app = express()
 app.get("/api/categories", getCategories)
 app.get("/api/reviews", getReviews)
 app.get("/api/reviews/:review_id", getReviewByID)
-
 app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
 
 // error handlers
 app.use(handle404noPaths)
-app.use(handle400BadId);
+app.use(handleCustomErrors)
 app.use(handle500s);
 
 // custom errors

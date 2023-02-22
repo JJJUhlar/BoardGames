@@ -25,6 +25,25 @@ exports.selectReviewsWithComCounts = () => {
         })
 }
 
+exports.checkReviewExists = (id) => {
+   return db.query(`
+                SELECT *
+                FROM reviews
+                WHERE review_id = $1;
+                `, [id])
+            .then(({rows})=>{
+                const review = rows[0]
+                if (!review) {
+                    return Promise.reject({
+                        status: 404,
+                        msg: `No review found for this ID: ${id}`
+                    })
+                } else {
+                    return id
+                }
+            })
+}
+
 exports.selectReviewCommentsByID = (id) => {
     return db.query(`
                     SELECT *

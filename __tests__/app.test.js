@@ -78,7 +78,6 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
-                    console.log(review)
                     
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
@@ -118,7 +117,16 @@ describe('appTests', () => {
                     }
                 })
         })
-        
+            test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
+                return request(app)
+                    .get('/api/reviews/5/comments')
+                    .expect(200)
+                    .then(({body})=>{
+                        const comments = body.reviewComments;
+                        expect(Array.isArray(comments)).toBe(true)
+                        expect(comments.length).toBe(0)
+                    })
+            })
     })
     
     describe('errors', () => {
@@ -139,6 +147,32 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
-
+        
+        test('GET: 404 /api/reviews/:review_id/notaroute ', () => {
+            return request(app)
+                .get('/api/reviews/3/bananapancakes')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe("Not found! :'( ")
+                })
+        })
+        test('GET: 400 /api/reviews/:bad_review_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/magicErrorThrowingCatapult/comments')
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                })
+        })
+        test('GET: 404 /api/reviews/:well_formed_but_non_existant_id/comments', () => {
+            return request(app)
+                .get('/api/reviews/99999990/comments')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('No review found for this ID: 99999990')
+                })
+        })
+            // /api/reviews/review_id/comments 
+        
     })
 })
