@@ -130,11 +130,42 @@ describe('appTests', () => {
         })
     })
 
-    describe('POST', () => {
-        test('POST: /api/reviews/:review_id/comments', () => {
+    describe('POST /api/reviews/:review_id/comments', () => {
+        test('POST: 201 correctly adds a comment to a review and returns the comment', () => {
             const body = {
                 "username": 'bainesface',
                 "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(body)
+                .expect(201) // 'created'
+                .then(({body})=>{
+                    console.log(body.postedComment)
+                    const post = body.postedComment;
+
+                    expect(Object.prototype.toString.call(post)).toBe('[object Object]')
+                    expect(Object.keys(post).length).toBe(6)
+                    
+                    expect(post).toHaveProperty("comment_id", expect.any(Number))
+                    expect(post).toHaveProperty("body", expect.any(String))
+                    expect(post).toHaveProperty("review_id", expect.any(Number))
+                    expect(post).toHaveProperty("author", expect.any(String))
+                    expect(post).toHaveProperty("votes", expect.any(Number))
+                    expect(post).toHaveProperty("created_at", expect.any(String))
+
+                    expect(post.author).toBe("bainesface")
+                    expect(post.body).toBe("I think this test game is amazing")
+
+                })
+        })
+        test('POST: 201 | ignores unnecessary properties', () => {
+            const body = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing',
+                "unneccessary prop 1": "superfluous value",
+                "unncessary prop 2": [1,2,3,4,5]
             }
 
             return request(app)
@@ -251,5 +282,20 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
+        test('POST: 400 errors when required properties are missing', () => {
+            const testComment = {
+                "I'm not a username": 'Neither am I',
+                "And I'm not a body": 'I will break your test'
+            }
+
+            return request(app)
+                .post('/api/reviews/impossible_route/comments')
+                .send(testComment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: missing values')
+                })
+        })
+
     })
 })
