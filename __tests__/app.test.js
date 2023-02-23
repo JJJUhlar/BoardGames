@@ -426,7 +426,7 @@ describe('appTests', () => {
                 .send(testComment)
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('POST: 400 errors when required properties are missing, to a correct path', () => {
