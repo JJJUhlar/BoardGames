@@ -1,4 +1,5 @@
 const {
+    selectUsers,
     selectCategories,
     selectReviewsWithComCounts,
     selectReviewByID,
@@ -56,9 +57,7 @@ exports.getReviewCommentsByID = (req,res,next) => {
 
 exports.postCommentToReviewByID = (req,res,next) => {
     const { review_id } = req.params
-    console.log(req.body, "<<<< should be req.body")
     const { username, body } = req.body
-    console.log(username, body, "<<< should be post username + body")
 
     if (username === undefined | body === undefined) {
         next({status: 400, msg: "Invalid Input: missing values"})
@@ -77,6 +76,15 @@ exports.postCommentToReviewByID = (req,res,next) => {
         })
         .catch((err)=>{
             next(err)
+        })   
+}
+
+exports.getUsers = (req,res,next) => {
+    return selectUsers()
+        .then((usersList)=>{
+            res.status(200).send({"users": usersList})
         })
-    
+        .catch((err)=>{
+            next(err)
+        })
 }

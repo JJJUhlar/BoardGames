@@ -75,7 +75,6 @@ exports.checkUserExists = (username) => {
                     `, [username])
         .then(({rows})=> {
             const user = rows[0]
-            console.log(user, "<< should be returned user")
             if (!user) {
                 return Promise.reject({
                     status: 404,
@@ -96,7 +95,13 @@ exports.insertCommentToReviewByID = (review_id, username, body) => {
                     RETURNING *;
                     `, [body, review_id, username])
         .then(({rows})=>{
-            console.log(rows[0], "<<< should be returned post inserted into comments table")
             return rows[0];
+        })
+}
+
+exports.selectUsers = () => {
+    return db.query(`SELECT * FROM users;`)
+        .then(({rows})=>{
+            return rows
         })
 }
