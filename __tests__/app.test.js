@@ -70,9 +70,9 @@ describe('appTests', () => {
                 
                 });
             })
-        test.skip('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
+        test('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
-                .get('/api/reviews?category=dexterity&sort_by=title&order=asc')
+                .get('/api/reviews?category=social+deduction&sort_by=title&order=asc')
                 .expect(200)
                 .then(({body})=>{
                     const reviews = body.reviews;
@@ -84,11 +84,11 @@ describe('appTests', () => {
                     expect(reviews).toBeSortedBy('title', {descending: false})
 
                     reviews.forEach((review) => {
-                        expect(review.category).toBe('dexterity')
+                        expect(review.category).toBe('social deduction')
                     })
                 })
         })
-        test.skip('GET 200: /api/reviews?category=social+deduction query defaults to sort by date and order descending if not specified', () => {
+        test('GET 200: /api/reviews?category=social+deduction query defaults to sort by date and order descending if not specified', () => {
             return request(app)
                 .get('/api/reviews?category=dexterity')
                 .expect(200)
@@ -97,6 +97,16 @@ describe('appTests', () => {
 
                     expect(reviews).toBeSortedBy('created_at', {descending: true})
                 })
+        })
+        test('GET 200: /api/reviews?badlyformedquery Ignores a bad query, and returns default get reviews request.', () => {
+            return request(app)
+            .get('/api/reviews')
+            .expect(200)
+            .then(({body})=>{
+                expect(Array.isArray(body.reviews)).toBe(true)
+                expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
+                expect(Object.keys(body.reviews[0]).length).toBe(9)
+            })
         })
         
         
@@ -232,23 +242,23 @@ describe('appTests', () => {
             })
         })
 
-        test.skip('GET: 404 /api/reviews? returns not found if there are no entries for the queried category', () => {
+        test('GET: 404 /api/reviews? returns not found if there are no entries for the queried category', () => {
             return request(app)
                 .get('/api/reviews?category=strategy')
                 .expect(404)
                 .then(({body})=>{
-                    expect(body.msg).toBe('Found no board games for the category: strategy')
+                    expect(body.msg).toBe('No review found for this category: strategy')
                 })
-        })
-        
-        test.skip('GET: 400 /api/reviews? errors if query is badly formed', () => {
+            })
+
+        test.skip('GET: 400 /api/reviews? errors if category query is badly formed', () => {
             return request(app)
-                .get('/api/reviews?category=12345&sort_by=TestingThisShouldError&order=badTestQuery')
+                .get('/api/reviews?category=12345&sort_by=undefined&order=NaN')
                 .expect(400)
                 .then(({body})=>{
                     expect(body.msg).toBe('Invalid Input: bad request')
                 })
-        })
+            })
 
 
 

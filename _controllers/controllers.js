@@ -1,3 +1,4 @@
+const { sort } = require('../db/data/test-data/categories')
 const {
     selectCategories,
     selectReviewsWithComCounts,
@@ -5,7 +6,8 @@ const {
     selectReviewCommentsByID,
     checkReviewExists,
     insertCommentToReviewByID,
-    checkUserExists
+    checkUserExists,
+    checkQueryParams
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -19,8 +21,11 @@ exports.getCategories = (request, response, next) => {
 }
 
 exports.getReviews = (req,res,next) => {
-    return selectReviewsWithComCounts()
+    const { category, sort_by, order } = req.query;
+
+    return selectReviewsWithComCounts(category, sort_by, order)
         .then((reviews)=>{
+            console.log(reviews)
             res.status(200).send({"reviews": reviews})
         })
         .catch((err)=>{

@@ -7,17 +7,28 @@ exports.selectCategories = () => {
     })
 }
 
-exports.selectReviewsWithComCounts = () => {
+exports.checkQueryParams = (category, sort_by, order) => {
     return db.query(`
-                    SELECT reviews.review_id, reviews.owner, reviews.title, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer,  COUNT(comments.body) AS comment_count
-                    FROM comments
-                    RIGHT JOIN reviews
-                    ON comments.review_id = reviews.review_id
-                    GROUP BY reviews.review_id
-                    ORDER BY reviews.created_at DESC;
                     `)
-        .then(({rows})=>{
-            // console.log(">>> selected reviews >>>", rows)
+        .then(({rows}))
+}
+
+exports.selectReviewsWithComCounts = (category = '%%', sort_by = 'created_at', order = 'DESC' ) => {
+    let query = `
+                SELECT reviews.review_id, reviews.owner, reviews.title, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer,  COUNT(comments.body) AS comment_count
+                FROM comments
+                RIGHT JOIN reviews
+                ON comments.review_id = reviews.review_id
+                WHERE category LIKE '${category}'
+                GROUP BY reviews.review_id
+                ORDER BY reviews.${sort_by} ${order};
+                `;
+
+    return db.query(query)
+        .then(({rows, rowCount}) => {
+            if (rowCount === 0) {
+                return Promise.reject({status: 404, msg: `No review found for this category: ${category}`})
+            }
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)
             })
@@ -75,7 +86,7 @@ exports.checkUserExists = (username) => {
                     `, [username])
         .then(({rows})=> {
             const user = rows[0]
-            console.log(user, "<< should be returned user")
+  
             if (!user) {
                 return Promise.reject({
                     status: 404,
@@ -96,7 +107,6 @@ exports.insertCommentToReviewByID = (review_id, username, body) => {
                     RETURNING *;
                     `, [body, review_id, username])
         .then(({rows})=>{
-            console.log(rows[0], "<<< should be returned post inserted into comments table")
             return rows[0];
         })
 }
