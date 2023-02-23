@@ -82,3 +82,42 @@ exports.insertNewVotes = (id, votesToAdd) =>{
             return rows[0]
         })       
 }
+
+exports.checkUserExists = (username) => {
+    return db.query(`
+                    SELECT *
+                    FROM users
+                    WHERE username = $1;
+                    `, [username])
+        .then(({rows})=> {
+            const user = rows[0]
+            if (!user) {
+                return Promise.reject({
+                    status: 404,
+                    msg: `No user found with this name: ${username}`
+                })
+            } else {
+                return user
+            }
+        })
+}
+
+exports.insertCommentToReviewByID = (review_id, username, body) => {
+    return db.query(`
+                    INSERT INTO comments
+                        (body, review_id, author)
+                    VALUES
+                        ($1,$2,$3)
+                    RETURNING *;
+                    `, [body, review_id, username])
+        .then(({rows})=>{
+            return rows[0];
+        })
+}
+
+exports.selectUsers = () => {
+    return db.query(`SELECT * FROM users;`)
+        .then(({rows})=>{
+            return rows
+        })
+}

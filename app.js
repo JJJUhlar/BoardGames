@@ -3,10 +3,12 @@ const db = require('./db/connection')
 // require controllers
 
 const {
+    getUsers,
     getCategories,
     getReviews,
     getReviewByID,
     getReviewCommentsByID,
+    postCommentToReviewByID,
     updateReviewVotes
 } = require('./_controllers/controllers')
 const {
@@ -30,6 +32,8 @@ app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
 
 
 app.patch("/api/reviews/:review_id", updateReviewVotes)
+app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
+app.get("/api/users", getUsers)
 
 // error handlers
 app.use(handle404noPaths)
