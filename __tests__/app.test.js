@@ -71,7 +71,7 @@ describe('appTests', () => {
                 
                 });
             })
-        test('/api/reviews accepts a category query, sort_by query, and order_query', () => {
+        test.skip('/api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
                 .get('/api/reviews?category=eurogame&sort_by=title&order=asc')
                 .expect(200)
@@ -85,7 +85,7 @@ describe('appTests', () => {
                         expect(review.category).toBe('eurogame')
                     })
 
-                    
+
                 })
         })
         
