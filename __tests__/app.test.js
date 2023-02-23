@@ -76,6 +76,7 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const reviews = body.reviews;
+                    console.log(body.reviews, "<<< should be reviews filtered and sorted")
 
                     expect(Array.isArray(reviews)).toBe(true)
                     expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object]')
@@ -87,10 +88,17 @@ describe('appTests', () => {
                     })
                 })
         })
-        test.todo('GET 404 /api/reviews? returns an empty array if there an empty array if there are no entries for the queried category')
-        test.todo('GET 200: /api/reviews?category=social+deduction query defaults to sort by date and order descending if not specified')
-        test.todo('400 errors if query is invalid')
-        test.todo('')
+        test.skip('GET 200: /api/reviews?category=social+deduction query defaults to sort by date and order descending if not specified', () => {
+            return request(app)
+                .get('/api/reviews?category=dexterity')
+                .expect(200)
+                .then(({body})=>{
+                    const reviews = body.reviews;
+
+                    expect(reviews).toBeSortedBy('created_at', {descending: true})
+                })
+        })
+        
         
 
         test('GET: 200 /api/reviews/:review_id', ()=>{
@@ -99,7 +107,7 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
-                    
+
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
                     expect(Object.keys(review).length).toBe(9)
@@ -168,7 +176,7 @@ describe('appTests', () => {
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
                     expect(Object.keys(post).length).toBe(6)
-                    
+
                     expect(post).toHaveProperty("comment_id", expect.any(Number))
                     expect(post).toHaveProperty("body", expect.any(String))
                     expect(post).toHaveProperty("review_id", expect.any(Number))
@@ -221,8 +229,29 @@ describe('appTests', () => {
                 .expect(404)
                 .then(({body}) => {
                     expect(body.msg).toBe("Not found! :'( ")
+            })
+        })
+
+        test.skip('GET: 404 /api/reviews? returns not found if there are no entries for the queried category', () => {
+            return request(app)
+                .get('/api/reviews?category=strategy')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Found no board games for the category: strategy')
                 })
         })
+        
+        test.skip('GET: 400 /api/reviews? errors if query is badly formed', () => {
+            return request(app)
+                .get('/api/reviews?category=12345&sort_by=TestingThisShouldError&order=badTestQuery')
+                .expect(400)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Invalid Input: bad request')
+                })
+        })
+
+
+
         test('responds 400 for bad review_id', () =>{
             return request(app)
                 .get('/api/reviews/notanid')
