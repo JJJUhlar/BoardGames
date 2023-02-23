@@ -117,16 +117,17 @@ describe('appTests', () => {
                     }
                 })
         })
-            test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
-                return request(app)
-                    .get('/api/reviews/5/comments')
-                    .expect(200)
-                    .then(({body})=>{
-                        const comments = body.reviewComments;
-                        expect(Array.isArray(comments)).toBe(true)
-                        expect(comments.length).toBe(0)
-                    })
-            })
+        
+        test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
+            return request(app)
+                .get('/api/reviews/5/comments')
+                .expect(200)
+                .then(({body})=>{
+                    const comments = body.reviewComments;
+                    expect(Array.isArray(comments)).toBe(true)
+                    expect(comments.length).toBe(0)
+                })
+        })
     })
 
     describe('POST', () => {
@@ -159,9 +160,6 @@ describe('appTests', () => {
 
                 })
         })
-        test.todo('Rejects an invalid comment post (wrong properties or value types)')
-        test.todo('Rejects a valid post to bad route ')
-        test.todo('Rejects a valid post, to a well formed, but non-existant review')
     })
     
     describe('errors', () => {
@@ -208,6 +206,50 @@ describe('appTests', () => {
                 })
         })
             // /api/reviews/review_id/comments 
-        
+        test('POST: 404 /api/reviews/:review_id/comments Rejects a well formed post to an existing review however for a non-existant user.', () => {
+
+            const testComment = {
+                "username": "I do not exist",
+                "body": "this game really tested me"
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(testComment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('No user found with this name: I do not exist')
+                })
+        })
+
+        test('POST: 404 /api/reviews/:non_existant_review_id/comments Rejects a valid post to a well formed but non existant route', () => {
+            const testComment = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/99999999/comments')
+                .send(testComment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('No review found for this ID: 99999999')
+                })
+        })
+
+        test('POST: 400 Rejects a valid post, to a badly formed route', () => {
+            const testComment = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/impossible_route/comments')
+                .send(testComment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                })
+        })
     })
 })
