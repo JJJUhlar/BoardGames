@@ -43,7 +43,6 @@ describe('appTests', () => {
             .get('/api/reviews')
             .expect(200)
             .then(({body})=>{
-                        
                 expect(Array.isArray(body.reviews)).toBe(true)
                 expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
                 expect(Object.keys(body.reviews[0]).length).toBe(9)
@@ -71,25 +70,29 @@ describe('appTests', () => {
                 
                 });
             })
-        test.skip('/api/reviews accepts a category query, sort_by query, and order_query', () => {
+        test.skip('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
-                .get('/api/reviews?category=eurogame&sort_by=title&order=asc')
+                .get('/api/reviews?category=dexterity&sort_by=title&order=asc')
                 .expect(200)
                 .then(({body})=>{
                     const reviews = body.reviews;
-                    
+
                     expect(Array.isArray(reviews)).toBe(true)
                     expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object]')
 
+                    expect(reviews).toBeSortedBy('title', {descending: false})
+
                     reviews.forEach((review) => {
-                        expect(review.category).toBe('eurogame')
+                        expect(review.category).toBe('dexterity')
                     })
-
-
                 })
         })
+        test.todo('GET 404 /api/reviews? returns an empty array if there an empty array if there are no entries for the queried category')
+        test.todo('GET 200: /api/reviews?category=social+deduction query defaults to sort by date and order descending if not specified')
+        test.todo('400 errors if query is invalid')
+        test.todo('')
         
-    
+
         test('GET: 200 /api/reviews/:review_id', ()=>{
             return request(app)
                 .get('/api/reviews/1')
