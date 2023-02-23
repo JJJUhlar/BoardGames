@@ -117,16 +117,80 @@ describe('appTests', () => {
                     }
                 })
         })
-            test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
-                return request(app)
-                    .get('/api/reviews/5/comments')
-                    .expect(200)
-                    .then(({body})=>{
-                        const comments = body.reviewComments;
-                        expect(Array.isArray(comments)).toBe(true)
-                        expect(comments.length).toBe(0)
-                    })
-            })
+        
+        test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
+            return request(app)
+                .get('/api/reviews/5/comments')
+                .expect(200)
+                .then(({body})=>{
+                    const comments = body.reviewComments;
+                    expect(Array.isArray(comments)).toBe(true)
+                    expect(comments.length).toBe(0)
+                })
+        })
+    })
+
+    describe('POST /api/reviews/:review_id/comments', () => {
+        test('POST: 201 correctly adds a comment to a review and returns the comment', () => {
+            const body = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(body)
+                .expect(201) // 'created'
+                .then(({body})=>{
+                    console.log(body.postedComment)
+                    const post = body.postedComment;
+
+                    expect(Object.prototype.toString.call(post)).toBe('[object Object]')
+                    expect(Object.keys(post).length).toBe(6)
+                    
+                    expect(post).toHaveProperty("comment_id", expect.any(Number))
+                    expect(post).toHaveProperty("body", expect.any(String))
+                    expect(post).toHaveProperty("review_id", expect.any(Number))
+                    expect(post).toHaveProperty("author", expect.any(String))
+                    expect(post).toHaveProperty("votes", expect.any(Number))
+                    expect(post).toHaveProperty("created_at", expect.any(String))
+
+                    expect(post.author).toBe("bainesface")
+                    expect(post.body).toBe("I think this test game is amazing")
+
+                })
+        })
+        test('POST: 201 | ignores unnecessary properties', () => {
+            const body = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing',
+                "unneccessary prop 1": "superfluous value",
+                "unncessary prop 2": [1,2,3,4,5]
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(body)
+                .expect(201) // 'created'
+                .then(({body})=>{
+                    console.log(body.postedComment)
+                    const post = body.postedComment;
+
+                    expect(Object.prototype.toString.call(post)).toBe('[object Object]')
+                    expect(Object.keys(post).length).toBe(6)
+                    
+                    expect(post).toHaveProperty("comment_id", expect.any(Number))
+                    expect(post).toHaveProperty("body", expect.any(String))
+                    expect(post).toHaveProperty("review_id", expect.any(Number))
+                    expect(post).toHaveProperty("author", expect.any(String))
+                    expect(post).toHaveProperty("votes", expect.any(Number))
+                    expect(post).toHaveProperty("created_at", expect.any(String))
+
+                    expect(post.author).toBe("bainesface")
+                    expect(post.body).toBe("I think this test game is amazing")
+
+                })
+        })
     })
     
     describe('errors', () => {
@@ -173,6 +237,65 @@ describe('appTests', () => {
                 })
         })
             // /api/reviews/review_id/comments 
-        
+        test('POST: 404 /api/reviews/:review_id/comments Rejects a well formed post to an existing review however for a non-existant user.', () => {
+
+            const testComment = {
+                "username": "I do not exist",
+                "body": "this game really tested me"
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(testComment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('No user found with this name: I do not exist')
+                })
+        })
+
+        test('POST: 404 /api/reviews/:non_existant_review_id/comments Rejects a valid post to a well formed but non existant route', () => {
+            const testComment = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/99999999/comments')
+                .send(testComment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('No review found for this ID: 99999999')
+                })
+        })
+
+        test('POST: 400 Rejects a valid post, to a badly formed route', () => {
+            const testComment = {
+                "username": 'bainesface',
+                "body": 'I think this test game is amazing'
+            }
+
+            return request(app)
+                .post('/api/reviews/impossible_route/comments')
+                .send(testComment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                })
+        })
+        test('POST: 400 errors when required properties are missing, to a correct path', () => {
+            const testComment = {
+                "I'm not a username": 'Neither am I',
+                "And I'm not a body": 'I will break your test'
+            }
+
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(testComment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: missing values')
+                })
+        })
+
     })
 })
