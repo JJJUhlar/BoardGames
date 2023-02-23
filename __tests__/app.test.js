@@ -130,6 +130,27 @@ describe('appTests', () => {
         })
     })
 
+    describe('GET: 200 /api/users', () => {
+        test('responds with an array of user objects', () => {
+            return request(app)
+                .get('/api/users')
+                .expect(200)
+                .then(({body})=>{
+                    const users = body.users
+                    expect(Array.isArray(users)).toBe(true)
+                    expect(Object.prototype.toString.call(users[0])).toBe('[object Object]')
+
+                    expect(users.length).toBe(4)
+
+                    users.forEach((user) => {
+                        expect(user).toHaveProperty('username', expect.any(String))
+                        expect(user).toHaveProperty('name', expect.any(String))
+                        expect(user).toHaveProperty('avatar_url', expect.any(String))
+                    })
+                })
+        })
+    })
+
     describe('POST /api/reviews/:review_id/comments', () => {
         test('POST: 201 correctly adds a comment to a review and returns the comment', () => {
             const body = {
@@ -296,6 +317,8 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: missing values')
                 })
         })
+
+        
 
     })
 })
