@@ -60,6 +60,9 @@ exports.postCommentToReviewByID = (req,res,next) => {
     const { username, body } = req.body
     console.log(username, body, "<<< should be post username + body")
 
+    if (username === undefined | body === undefined) {
+        next({status: 400, msg: "Invalid Input: missing values"})
+    }
     // check review exists 
     // check user exists
 

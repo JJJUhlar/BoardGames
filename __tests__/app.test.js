@@ -282,14 +282,14 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
-        test('POST: 400 errors when required properties are missing', () => {
+        test('POST: 400 errors when required properties are missing, to a correct path', () => {
             const testComment = {
                 "I'm not a username": 'Neither am I',
                 "And I'm not a body": 'I will break your test'
             }
 
             return request(app)
-                .post('/api/reviews/impossible_route/comments')
+                .post('/api/reviews/1/comments')
                 .send(testComment)
                 .expect(400)
                 .then(({body}) => {
