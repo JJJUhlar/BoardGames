@@ -60,9 +60,9 @@ describe('appTests', () => {
                     })
                 
                 const reviewDates = body.reviews.map((review)=>{
-                const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
+                        const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
             
-                return parseInt(date,10)
+                        return parseInt(date,10)
                     });
 
                 for (let i = 1; i < reviewDates.length; i++) {
@@ -71,6 +71,24 @@ describe('appTests', () => {
                 
                 });
             })
+        test('/api/reviews accepts a category query, sort_by query, and order_query', () => {
+            return request(app)
+                .get('/api/reviews?category=eurogame&sort_by=title&order=asc')
+                .expect(200)
+                .then(({body})=>{
+                    const reviews = body.reviews;
+                    
+                    expect(Array.isArray(reviews)).toBe(true)
+                    expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object]')
+
+                    reviews.forEach((review) => {
+                        expect(review.category).toBe('eurogame')
+                    })
+
+                    
+                })
+        })
+        
     
         test('GET: 200 /api/reviews/:review_id', ()=>{
             return request(app)
