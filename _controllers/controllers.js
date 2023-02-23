@@ -61,13 +61,11 @@ exports.updateReviewVotes = (req,res,next) => {
         next({status: 400, msg: "Invalid Input: missing inc_votes"})
     }
 
-    const review_check_promise = checkReviewExists(review_id)
-    const update_votes_promise = insertNewVotes(review_id, inc_votes)
-
-    Promise.all([update_votes_promise, review_check_promise])
+    
+    return insertNewVotes(review_id, inc_votes)
         .then((result) => {
 
-            res.status(202).send({"updatedReview": result[0]})
+            res.status(202).send({"updatedReview": result})
         })
         .catch((err)=>{
             next(err)

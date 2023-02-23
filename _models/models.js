@@ -74,8 +74,11 @@ exports.insertNewVotes = (id, votesToAdd) =>{
                     WHERE review_id = $1
                     RETURNING *;
                     `, [id, votesToAdd])
-        .then(({rows}) => {
-            console.log(rows[0], `<<< should be updated votes for ${id}`)
+        .then(({rows, rowCount}) => {
+            
+            if (rowCount === 0) {
+                return Promise.reject({status: 404, msg: `No review found for this ID: ${id}`})
+            }
             return rows[0]
         })       
 }

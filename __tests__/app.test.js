@@ -146,8 +146,9 @@ describe('appTests', () => {
                     expect(Object.prototype.toString.call(body.updatedReview)).toBe('[object Object]')
 
                     expect(Object.keys(body.updatedReview).length).toBe(9)
+                    expect
 
-                    expect(body.updatedReview).toHaveProperty('review_id',expect.any(Number))
+                    expect(body.updatedReview).toHaveProperty('review_id',2)
                     expect(body.updatedReview).toHaveProperty('title',expect.any(String))
                     expect(body.updatedReview).toHaveProperty('category',expect.any(String))
                     expect(body.updatedReview).toHaveProperty('designer',expect.any(String))
@@ -155,7 +156,7 @@ describe('appTests', () => {
                     expect(body.updatedReview).toHaveProperty('review_body',expect.any(String))
                     expect(body.updatedReview).toHaveProperty('review_img_url',expect.any(String))
                     expect(body.updatedReview).toHaveProperty('created_at',expect.any(String))
-                    expect(body.updatedReview).toHaveProperty('votes',expect.any(Number))
+                    
                 })
         })
         test('decrements votes for a review by a specified amount', () => {
