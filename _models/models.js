@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const { sort } = require('../db/data/test-data/categories')
 
 exports.selectCategories = () => { 
     return db.query('SELECT * FROM categories;')
@@ -13,21 +14,33 @@ exports.checkQueryParams = (category, sort_by, order) => {
         .then(({rows}))
 }
 
-exports.selectReviewsWithComCounts = (category = '%%', sort_by = 'created_at', order = 'DESC' ) => {
+exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = 'created_at', order = 'DESC' ) => {
+
+    if (!['dexterity', "children's games", "social deduction", "euro game"].includes(category)) {
+        return Promise.reject({status: 400, msg: 'Bad Request: Invalid category '})
+    }
+    if (!['ASC','DESC'].includes(order)) {
+        return Promise.reject({status: 400, msg: 'Bad Request: Invalid order query'})
+    }
+    if (!['review_id','owner','title','category','created_at','votes','designer','comment_count','review_img)url'].includes(sort_by)) {
+        return Promise.reject({status: 400, msg: 'Bad Request: Invalid sort query'})
+    }
+
     let query = `
                 SELECT reviews.review_id, reviews.owner, reviews.title, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer,  COUNT(comments.body) AS comment_count
                 FROM comments
                 RIGHT JOIN reviews
                 ON comments.review_id = reviews.review_id
-                WHERE category LIKE '${category}'
+                WHERE category = $1
                 GROUP BY reviews.review_id
                 ORDER BY reviews.${sort_by} ${order};
                 `;
 
-    return db.query(query)
+    return db.query(query, [category])
         .then(({rows, rowCount}) => {
+            
             if (rowCount === 0) {
-                return Promise.reject({status: 404, msg: `No review found for this category: ${category}`})
+                return Promise.reject({status: 404, msg: `No reviews found for this category: ${category}`})
             }
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)

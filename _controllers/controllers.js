@@ -1,4 +1,3 @@
-const { sort } = require('../db/data/test-data/categories')
 const {
     selectCategories,
     selectReviewsWithComCounts,
@@ -6,8 +5,7 @@ const {
     selectReviewCommentsByID,
     checkReviewExists,
     insertCommentToReviewByID,
-    checkUserExists,
-    checkQueryParams
+    checkUserExists
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -25,7 +23,6 @@ exports.getReviews = (req,res,next) => {
 
     return selectReviewsWithComCounts(category, sort_by, order)
         .then((reviews)=>{
-            console.log(reviews)
             res.status(200).send({"reviews": reviews})
         })
         .catch((err)=>{
@@ -61,15 +58,11 @@ exports.getReviewCommentsByID = (req,res,next) => {
 
 exports.postCommentToReviewByID = (req,res,next) => {
     const { review_id } = req.params
-    console.log(req.body, "<<<< should be req.body")
     const { username, body } = req.body
-    console.log(username, body, "<<< should be post username + body")
 
     if (username === undefined || body === undefined) {
         next({status: 400, msg: "Invalid Input: missing values"})
     }
-    // check review exists 
-    // check user exists
 
     const check_user_exists_promise = checkUserExists(username)
     const review_id_check_promise = checkReviewExists(review_id)
@@ -77,7 +70,6 @@ exports.postCommentToReviewByID = (req,res,next) => {
 
     Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
         .then((result) => {
-            console.log(result[0], "<<<< should be posted comment")
             res.status(201).send({"postedComment": result[0]})
         })
         .catch((err)=>{

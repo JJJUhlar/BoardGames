@@ -72,11 +72,10 @@ describe('appTests', () => {
             })
         test('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
-                .get('/api/reviews?category=social+deduction&sort_by=title&order=asc')
+                .get('/api/reviews?category=social+deduction&sort_by=title&order=ASC')
                 .expect(200)
                 .then(({body})=>{
                     const reviews = body.reviews;
-                    console.log(body.reviews, "<<< should be reviews filtered and sorted")
 
                     expect(Array.isArray(reviews)).toBe(true)
                     expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object]')
@@ -181,7 +180,6 @@ describe('appTests', () => {
                 .send(body)
                 .expect(201) // 'created'
                 .then(({body})=>{
-                    console.log(body.postedComment)
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
@@ -212,7 +210,6 @@ describe('appTests', () => {
                 .send(body)
                 .expect(201) // 'created'
                 .then(({body})=>{
-                    console.log(body.postedComment)
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
@@ -244,19 +241,27 @@ describe('appTests', () => {
 
         test('GET: 404 /api/reviews? returns not found if there are no entries for the queried category', () => {
             return request(app)
-                .get('/api/reviews?category=strategy')
+                .get("/api/reviews?category=children's+games")
                 .expect(404)
                 .then(({body})=>{
-                    expect(body.msg).toBe('No review found for this category: strategy')
+                    expect(body.msg).toBe("No reviews found for this category: children's games")
                 })
             })
 
-        test.skip('GET: 400 /api/reviews? errors if category query is badly formed', () => {
+        test('GET: 400 /api/reviews? errors if sort query is badly formed', () => {
             return request(app)
-                .get('/api/reviews?category=12345&sort_by=undefined&order=NaN')
+                .get('/api/reviews?category=dexterity&sort_by=[object Object]')
                 .expect(400)
                 .then(({body})=>{
-                    expect(body.msg).toBe('Invalid Input: bad request')
+                    expect(body.msg).toBe('Bad Request: Invalid sort query')
+                })
+            })
+        test('GET: 400 /api/reviews? errors if order query is badly formed', () => {
+            return request(app)
+                .get('/api/reviews?category=dexterity&order=[object Object]')
+                .expect(400)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Bad Request: Invalid order query')
                 })
             })
 
