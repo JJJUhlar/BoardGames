@@ -66,3 +66,16 @@ exports.selectReviewByID = (id) => {
         return rows[0]
     })
 }
+
+exports.insertNewVotes = (id, votesToAdd) =>{
+    return db.query(`
+                    UPDATE reviews
+                    SET votes = votes + $2
+                    WHERE review_id = $1
+                    RETURNING *;
+                    `, [id, votesToAdd])
+        .then(({rows}) => {
+            console.log(rows[0], `<<< should be updated votes for ${id}`)
+            return rows[0]
+        })       
+}

@@ -29,7 +29,7 @@ app.get("/api/reviews/:review_id", getReviewByID)
 app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
 
 
-// app.patch("/api/reviews/:review_id", updateReviewVotes)
+app.patch("/api/reviews/:review_id", updateReviewVotes)
 
 // error handlers
 app.use(handle404noPaths)

@@ -129,18 +129,33 @@ describe('appTests', () => {
         })
     })
 
-    describe.skip('PATCH 202 /api/reviews/:review_id', () => {
+    describe('PATCH 202 /api/reviews/:review_id', () => {
         test('increments votes for a review by a given amount ', () => {
             const testPatch = {
                 "inc_votes": 5 
             }
 
             return request(app)
-                .patch('/api/reviews/1')
+                .patch('/api/reviews/2')
                 .send(testPatch)
                 .expect(202)
                 .then(({body}) => {
-                    expect(body.updatedReview)
+                    console.log(body.updatedReview, "<<< should have returned updated review")
+                    expect(body.updatedReview.votes).toBe(10)
+
+                    expect(Object.prototype.toString.call(body.updatedReview)).toBe('[object Object]')
+
+                    expect(Object.keys(body.updatedReview).length).toBe(9)
+
+                    expect(body.updatedReview).toHaveProperty('review_id',expect.any(Number))
+                    expect(body.updatedReview).toHaveProperty('title',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('category',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('designer',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('owner',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('review_body',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('review_img_url',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('created_at',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('votes',expect.any(Number))
                 })
         })
         test('decrements votes for a review by a specified amount', () => {
@@ -149,16 +164,16 @@ describe('appTests', () => {
             }
 
             return request(app)
-                .patch('/api/reviews/1')
+                .patch('/api/reviews/9')
                 .send(testPatch)
                 .expect(202)
                 .then(({body}) => {
-                    expect(body.updatedReview)
+                    expect(body.updatedReview.votes).toBe(5)
                 })
         })
         test('ignores unncessary properties', () => {
             const testPatch = {
-                "inc_votes": -5,
+                "inc_votes": 9,
                 "Extra property 1": "asldkjad",
                 "Extra property 2": [12,3,,4,5,,6] 
             }
@@ -168,8 +183,8 @@ describe('appTests', () => {
                 .send(testPatch)
                 .expect(202)
                 .then(({body}) => {
-                    expect(body.updatedReview)
-                })
+                    expect(body.updatedReview.votes).toBe(10)
+            })
         })
     })
 
@@ -189,7 +204,7 @@ describe('appTests', () => {
                 .expect(400)
                 .then(({body})=>{
 
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         
@@ -206,7 +221,7 @@ describe('appTests', () => {
                 .get('/api/reviews/magicErrorThrowingCatapult/comments')
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('GET: 404 /api/reviews/:well_formed_but_non_existant_id/comments', () => {
@@ -219,7 +234,7 @@ describe('appTests', () => {
         })
             // /api/reviews/review_id/comments 
         
-        test.skip('PATCH: 404 /api/reviews/:non_existant_review_id | errors for a well_formed for but non-existant review', () => {
+        test('PATCH: 404 /api/reviews/:non_existant_review_id | errors for a well_formed for but non-existant review', () => {
             const testPatch = {
                 "inc_votes": -5 
             }
@@ -232,7 +247,7 @@ describe('appTests', () => {
                     expect(body.msg).toBe('No review found for this ID: 99999')
                 })
         })
-        test.skip('PATCH: 400 /api/reviews/:not_a_valid_review_id | errors for a valid patch, but to a bad path', () => {
+        test('PATCH: 400 /api/reviews/:not_a_valid_review_id | errors for a valid patch, but to a bad path', () => {
             const testPatch = {
                 "inc_votes": -5 
             }
@@ -242,10 +257,10 @@ describe('appTests', () => {
                 .send(testPatch)
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
-        test.skip('PATCH: 400 /api/reviews/:review_id | errors for a malformed patch request to a valid review_id', () => {
+        test('PATCH: 400 /api/reviews/:review_id | errors for a malformed patch request to a valid review_id', () => {
             const testPatch = {
                 "inc_votes": "What happens if I'm *not* an integer!" 
             }
@@ -255,10 +270,10 @@ describe('appTests', () => {
                 .send(testPatch)
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
-        test.skip('PATCH: 400 /api/reviews/:review_id | errors for a well formed request but missing necessary properties', () => {
+        test('PATCH: 400 /api/reviews/:review_id | errors for a well formed request but missing necessary properties', () => {
             const testPatch = {
                 "not inc votes": "I should break your test" 
             }

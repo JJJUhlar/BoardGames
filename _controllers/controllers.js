@@ -3,7 +3,8 @@ const {
     selectReviewsWithComCounts,
     selectReviewByID,
     selectReviewCommentsByID,
-    checkReviewExists
+    checkReviewExists,
+    insertNewVotes
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -50,4 +51,27 @@ exports.getReviewCommentsByID = (req,res,next) => {
         .catch((err)=>{
             next(err);
         })
+}
+
+exports.updateReviewVotes = (req,res,next) => {
+    const { review_id } = req.params;
+    const { inc_votes } = req.body;
+
+    if (!inc_votes) {
+        next({status: 400, msg: "Invalid Input: missing inc_votes"})
+    }
+
+    const review_check_promise = checkReviewExists(review_id)
+    const update_votes_promise = insertNewVotes(review_id, inc_votes)
+
+    Promise.all([update_votes_promise, review_check_promise])
+        .then((result) => {
+
+            res.status(202).send({"updatedReview": result[0]})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+        
+
 }
