@@ -93,6 +93,32 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
         })
+
+
+        
+        test.skip('GET: 200 /api/reviews/:review_id?comment_count=true | Can use a query to get back comment counts for the given review', () => {
+            return request(app)
+                .get('/api/reviews/3?comment_count=true')
+                .expect(200)
+                .then(({body}) => {
+                    const review = body.review;
+
+                    expect(review.comments).toBe(3)
+                })
+        })
+        
+        
+        test.skip('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
+            return request(app)
+                .get('/api/reviews/1?comment_count=true')
+                .expect(200)
+                .then(({body})=>{
+                    const review = body.review;
+
+                    expect(review.comments).toBe(0)
+                })
+        })
+
         test('GET: 200 /api/reviews/:review_id/comments', () => {
             return request(app)
                 .get('/api/reviews/3/comments')
@@ -233,6 +259,15 @@ describe('appTests', () => {
                 })
         })
         
+        test.skip('GET: 400 /api/reviews/:review_id?comment_count= | Errors if sent an invalid comment_count query ', () => {
+            return request(app)
+                .get('/api/reviews/3?comment_count=undefinedNaN[object Object]')
+                .expect(400)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Invalid Input: Bad Query')
+                })
+        })
+
         test('GET: 404 /api/reviews/:review_id/notaroute ', () => {
             return request(app)
                 .get('/api/reviews/3/bananapancakes')
