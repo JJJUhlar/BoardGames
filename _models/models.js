@@ -17,7 +17,7 @@ exports.selectReviewsWithComCounts = () => {
                     ORDER BY reviews.created_at DESC;
                     `)
         .then(({rows})=>{
-            // console.log(">>> selected reviews >>>", rows)
+            
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)
             })
@@ -69,7 +69,7 @@ exports.selectReviewByID = (id) => {
 
     return db.query(dbQuery, [id])
     .then(({rows}) => {
-        console.log(rows, "<<< should be reviews by id")
+        
         return rows[0]
     })
 }

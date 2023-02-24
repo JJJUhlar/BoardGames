@@ -65,8 +65,6 @@ exports.postCommentToReviewByID = (req,res,next) => {
     if (username === undefined | body === undefined) {
         next({status: 400, msg: "Invalid Input: missing values"})
     }
-    // check review exists 
-    // check user exists
 
     const check_user_exists_promise = checkUserExists(username)
     const review_id_check_promise = checkReviewExists(review_id)
@@ -74,7 +72,6 @@ exports.postCommentToReviewByID = (req,res,next) => {
 
     Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
         .then((result) => {
-            console.log(result[0], "<<<< should be posted comment")
             res.status(201).send({"postedComment": result[0]})
         })
         .catch((err)=>{

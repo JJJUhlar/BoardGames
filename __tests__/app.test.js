@@ -136,7 +136,7 @@ describe('appTests', () => {
                         expect(comment).toHaveProperty('body', expect.any(String))
                         expect(comment).toHaveProperty('review_id', expect.any(Number))
                     })
-                    // should return in descending order (most recent first)
+
                     for (let i = 1; i < comments.length; i++) {
                         expect(Date.parse(comments[i-1].created_at) > Date.parse(comments[i].created_at)).toBe(true)
                     }
@@ -186,9 +186,9 @@ describe('appTests', () => {
             return request(app)
                 .post('/api/reviews/1/comments')
                 .send(body)
-                .expect(201) // 'created'
+                .expect(201) 
                 .then(({body})=>{
-                    console.log(body.postedComment)
+                
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
@@ -217,9 +217,8 @@ describe('appTests', () => {
             return request(app)
                 .post('/api/reviews/1/comments')
                 .send(body)
-                .expect(201) // 'created'
+                .expect(201) 
                 .then(({body})=>{
-                    console.log(body.postedComment)
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
