@@ -237,6 +237,27 @@ describe('appTests', () => {
 
                 })
         })
+
+
+        test.skip('GET: 200 /api responds with json of all available endpoints', () => {
+            return request(app)
+                .get('/api')
+                .expect(200)
+                .then(({body}) => {
+                    const endpoints = body.endpoints
+                    expect(typeof endpoints).toBe(JSON)
+                    expect(endpoints).toEqual({
+                        "GET": "/api/categories",
+                        "GET": "/api/reviews",
+                        "GET": "/api/reviews/:review_id",
+                        "GET": "/api/reviews/:review_id/comments",
+                        "POST": "/api/reviews/:review_id/comments",
+                        "DELETE": "/api/comments/:comment_id",
+                        "PATCH": "/api/reviews/:review_id",
+                        "GET": "/api/users"
+                    })
+                })
+        })
     })
     
     describe('errors', () => {
