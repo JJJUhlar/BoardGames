@@ -6,7 +6,8 @@ const {
     selectReviewCommentsByID,
     checkReviewExists,
     insertCommentToReviewByID,
-    checkUserExists
+    checkUserExists,
+    deleteSelectedComment
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -74,7 +75,6 @@ exports.postCommentToReviewByID = (req,res,next) => {
 
     Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
         .then((result) => {
-            console.log(result[0], "<<<< should be posted comment")
             res.status(201).send({"postedComment": result[0]})
         })
         .catch((err)=>{
@@ -86,6 +86,18 @@ exports.getUsers = (req,res,next) => {
     return selectUsers()
         .then((usersList)=>{
             res.status(200).send({"users": usersList})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+}
+
+exports.deleteComment = (req,res,next) => {
+    const { comment_id } = req.params
+
+    return deleteSelectedComment(comment_id)
+        .then(()=>{
+            res.status(204).send()
         })
         .catch((err)=>{
             next(err)
