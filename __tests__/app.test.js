@@ -237,6 +237,15 @@ describe('appTests', () => {
 
                 })
         })
+
+        test.skip('DELETE: 204 /api/comments/:comment_id deletes a comment given an id', () => {
+            return request(app)
+                .delete('/api/comments/1')
+                .expect(204)
+                .then(({body})=>{
+                    expect(body.msg).toBe('no content')
+                })
+        })
     })
     
     describe('errors', () => {
@@ -343,7 +352,23 @@ describe('appTests', () => {
                 })
         })
 
-        
+        test.skip('DELETE: 404 /api/comments/:comment_id 404 errors if a comment does not exist', () => {
+            return request(app)
+                .delete('/api/comments/99999')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('No comment found for this id: 99999')
+                })
+        })
+
+        test.skip('DELETE: 400 /api/comments/badRequest errors if a bad comment id is passed', () =>{
+            return request(app)
+                .delete('/api/comments/undefinedNaN[object Object]')
+                .expect(400)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Invalid Input: bad request')
+                })
+        })
 
     })
 })

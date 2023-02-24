@@ -33,6 +33,9 @@ app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 
 app.get("/api/users", getUsers)
 
+
+app.delete("/api/comments/:comment_id")
+
 // error handlers
 app.use(handle404noPaths)
 app.use(handleCustomErrors)
