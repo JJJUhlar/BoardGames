@@ -102,11 +102,17 @@ exports.selectReviewCommentsByID = (id) => {
     }
 
 exports.selectReviewByID = (id) => {
-    return db.query(`
-                    SELECT review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at
-                    FROM reviews
-                    WHERE review_id = $1;
-                    `, [id])
+
+    dbQuery =   `
+                SELECT reviews.review_id, reviews.title, reviews.review_body, reviews.designer, reviews.review_img_url, reviews.votes, reviews.category, reviews.owner, reviews.created_at, COUNT(comments.body) AS comment_count
+                FROM reviews
+                LEFT JOIN comments
+                ON reviews.review_id = comments.review_id
+                WHERE reviews.review_id = $1
+                GROUP BY reviews.review_id;
+                `;
+
+    return db.query(dbQuery, [id])
     .then(({rows}) => {
         return rows[0]
     })
@@ -150,4 +156,18 @@ exports.selectUsers = () => {
         .then(({rows})=>{
             return rows
         })
+}
+
+exports.deleteSelectedComment = (comment_id) => {
+    return db.query(`
+                    DELETE FROM comments
+                    WHERE comment_id = $1
+                    RETURNING *;
+                    `, [comment_id])
+            .then(({rows, rowCount})=>{
+                if (rowCount === 0) {
+                    return Promise.reject({status: 404, msg: `No comment found for this id: ${comment_id}`})
+                }
+                return rows[0]
+            })
 }

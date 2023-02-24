@@ -6,7 +6,8 @@ const {
     selectReviewCommentsByID,
     checkReviewExists,
     insertCommentToReviewByID,
-    checkUserExists
+    checkUserExists,
+    deleteSelectedComment
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -36,6 +37,9 @@ exports.getReviewByID = (req, res, next) => {
 
     return selectReviewByID(review_id)
         .then((result)=>{
+            if (result.comment_count) {
+                result.comment_count = Number(result.comment_count)
+            }
             res.status(200).send({"review": result});
         })
         .catch((err)=>{
@@ -82,6 +86,18 @@ exports.getUsers = (req,res,next) => {
     return selectUsers()
         .then((usersList)=>{
             res.status(200).send({"users": usersList})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+}
+
+exports.deleteComment = (req,res,next) => {
+    const { comment_id } = req.params
+
+    return deleteSelectedComment(comment_id)
+        .then(()=>{
+            res.status(204).send()
         })
         .catch((err)=>{
             next(err)
