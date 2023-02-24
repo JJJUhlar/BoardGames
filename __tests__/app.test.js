@@ -73,7 +73,7 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
-                    console.log(review, "<<<< GEt api/reviews/:review_id")
+                    
                     
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
@@ -121,7 +121,7 @@ describe('appTests', () => {
                 .then(({body})=>{
                     const comments = body.comments;
                     
-                    console.log(comments)
+                   
                     
                     expect(Array.isArray(comments)).toBe(true)
                     expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
@@ -162,7 +162,7 @@ describe('appTests', () => {
                 .then(({body})=>{
                     const users = body.users
 
-                    console.log(users)
+                   
                     expect(Array.isArray(users)).toBe(true)
                     expect(Object.prototype.toString.call(users[0])).toBe('[object Object]')
 
@@ -192,7 +192,7 @@ describe('appTests', () => {
                  
                     const post = body.comment;
 
-                    console.log(post)
+                    
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
                     expect(Object.keys(post).length).toBe(6)
@@ -247,7 +247,7 @@ describe('appTests', () => {
                 .then(({body}) => {
                     
                     const endpoints = JSON.parse(body.endpoints)
-                    console.log(endpoints)
+                
                     
 
                     expect(endpoints).toHaveProperty("GET /api")
