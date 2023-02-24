@@ -17,7 +17,6 @@ exports.selectReviewsWithComCounts = () => {
                     ORDER BY reviews.created_at DESC;
                     `)
         .then(({rows})=>{
-            
             rows.forEach((row)=>{
                 row.comment_count = parseInt(row.comment_count)
             })
@@ -69,7 +68,6 @@ exports.selectReviewByID = (id) => {
 
     return db.query(dbQuery, [id])
     .then(({rows}) => {
-        
         return rows[0]
     })
 }
@@ -111,4 +109,18 @@ exports.selectUsers = () => {
         .then(({rows})=>{
             return rows
         })
+}
+
+exports.deleteSelectedComment = (comment_id) => {
+    return db.query(`
+                    DELETE FROM comments
+                    WHERE comment_id = $1
+                    RETURNING *;
+                    `, [comment_id])
+            .then(({rows, rowCount})=>{
+                if (rowCount === 0) {
+                    return Promise.reject({status: 404, msg: `No comment found for this id: ${comment_id}`})
+                }
+                return rows[0]
+            })
 }

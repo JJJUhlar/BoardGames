@@ -6,7 +6,8 @@ const {
     selectReviewCommentsByID,
     checkReviewExists,
     insertCommentToReviewByID,
-    checkUserExists
+    checkUserExists,
+    deleteSelectedComment
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -102,3 +103,15 @@ exports.getEndPoints = (req,res,next) => {
     }
     res.status(200).json(endpoints)
 } 
+
+exports.deleteComment = (req,res,next) => {
+    const { comment_id } = req.params
+
+    return deleteSelectedComment(comment_id)
+        .then(()=>{
+            res.status(204).send()
+        })
+        .catch((err)=>{
+            next(err)
+        })
+}

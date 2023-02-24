@@ -4,9 +4,10 @@ exports.handle404noPaths = (req, res, next) => {
 
 exports.handleCustomErrors = (err, req, res, next) =>{
     if (err.status && err.msg) {
+
         res.status(err.status).send({"msg": err.msg})
     } else if ( err.code === '22P02') {
-        res.status(400).send({msg: 'Invalid Input: bad review ID'})
+        res.status(400).send({msg: 'Invalid Input: bad request'})
     } else {
         next(err)
     }
@@ -14,7 +15,7 @@ exports.handleCustomErrors = (err, req, res, next) =>{
 
 
 exports.handle500s = (err,req,res,next) => {
-    
+
     res.status(500).send("internal server error")
 };
 
