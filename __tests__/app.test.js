@@ -81,7 +81,7 @@ describe('appTests', () => {
                     
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
-                    expect(Object.keys(review).length).toBe(9)
+                    expect(Object.keys(review).length).toBe(10)
                     expect(review).toHaveProperty('review_id', expect.any(Number))
                     expect(review).toHaveProperty('title', expect.any(String))
                     expect(review).toHaveProperty('review_body', expect.any(String))
@@ -93,6 +93,31 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
         })
+
+
+        
+        test('GET: 200 /api/reviews/:review_id| Can use a query to get back comment counts for the given review', () => {
+            return request(app)
+                .get('/api/reviews/3')
+                .expect(200)
+                .then(({body}) => {
+                    const review = body.review;
+                    expect(review.comment_count).toBe(3)
+                })
+        })
+        
+        
+        test('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
+            return request(app)
+                .get('/api/reviews/1')
+                .expect(200)
+                .then(({body})=>{
+                    const review = body.review;
+
+                    expect(review.comment_count).toBe(0)
+                })
+        })
+
         test('GET: 200 /api/reviews/:review_id/comments', () => {
             return request(app)
                 .get('/api/reviews/3/comments')
@@ -232,7 +257,7 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad review ID')
                 })
         })
-        
+
         test('GET: 404 /api/reviews/:review_id/notaroute ', () => {
             return request(app)
                 .get('/api/reviews/3/bananapancakes')
