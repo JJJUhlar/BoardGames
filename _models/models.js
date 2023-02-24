@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const fs = require('fs/promises')
 
 exports.selectCategories = () => { 
     return db.query('SELECT * FROM categories;')
@@ -123,4 +124,9 @@ exports.deleteSelectedComment = (comment_id) => {
                 }
                 return rows[0]
             })
+}
+
+exports.retrieveEndpoints = () =>{ 
+    return fs.readFile('endpoints.json','utf-8')
+        
 }
