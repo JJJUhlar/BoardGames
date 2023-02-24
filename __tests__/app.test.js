@@ -81,7 +81,7 @@ describe('appTests', () => {
                     
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
-                    expect(Object.keys(review).length).toBe(9)
+                    expect(Object.keys(review).length).toBe(10)
                     expect(review).toHaveProperty('review_id', expect.any(Number))
                     expect(review).toHaveProperty('title', expect.any(String))
                     expect(review).toHaveProperty('review_body', expect.any(String))
@@ -96,14 +96,12 @@ describe('appTests', () => {
 
 
         
-        test('GET: 200 /api/reviews/:review_id?comment_count=true | Can use a query to get back comment counts for the given review', () => {
+        test('GET: 200 /api/reviews/:review_id| Can use a query to get back comment counts for the given review', () => {
             return request(app)
-                .get('/api/reviews/3?comment_count=true')
+                .get('/api/reviews/3')
                 .expect(200)
                 .then(({body}) => {
                     const review = body.review;
-                    console.log(body.review, "<<< should be review with 3 comments")
-
                     expect(review.comment_count).toBe(3)
                 })
         })
@@ -111,10 +109,9 @@ describe('appTests', () => {
         
         test('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
             return request(app)
-                .get('/api/reviews/1?comment_count=true')
+                .get('/api/reviews/1')
                 .expect(200)
                 .then(({body})=>{
-                    console.log(body.review, "<<< should be review with no comments")
                     const review = body.review;
 
                     expect(review.comment_count).toBe(0)
@@ -258,15 +255,6 @@ describe('appTests', () => {
                 .then(({body})=>{
 
                     expect(body.msg).toBe('Invalid Input: bad review ID')
-                })
-        })
-        
-        test('GET: 400 /api/reviews/:review_id?comment_count=[object Object] | Errors if sent an invalid comment_count query ', () => {
-            return request(app)
-                .get('/api/reviews/3?comment_count=undefinedNaN[object Object]')
-                .expect(400)
-                .then(({body})=>{
-                    expect(body.msg).toBe('Invalid Input: Bad Query')
                 })
         })
 
