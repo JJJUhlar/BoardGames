@@ -121,8 +121,6 @@ describe('appTests', () => {
                 .then(({body})=>{
                     const comments = body.comments;
                     
-                   
-                    
                     expect(Array.isArray(comments)).toBe(true)
                     expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
     
