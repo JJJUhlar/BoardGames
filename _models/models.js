@@ -56,13 +56,33 @@ exports.selectReviewCommentsByID = (id) => {
         })
     }
 
-exports.selectReviewByID = (id) => {
-    return db.query(`
-                    SELECT review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at
+exports.selectReviewByID = (id, comment_count) => {
+    if (comment_count && !['true','false'].includes(comment_count)) {
+        return Promise.reject({status: 400, msg: 'Invalid Input: Bad Query'})
+        
+    }
+
+    let dbQuery = ``
+    if (comment_count === 'true') {
+        dbQuery =   `
+                    SELECT reviews.review_id, reviews.title, reviews.review_body, reviews.designer, reviews.review_img_url, reviews.votes, reviews.category, reviews.owner, reviews.created_at, COUNT(comments.body) AS comment_count
                     FROM reviews
-                    WHERE review_id = $1;
-                    `, [id])
+                    LEFT JOIN comments
+                    ON reviews.review_id = comments.review_id
+                    WHERE reviews.review_id = $1
+                    GROUP BY reviews.review_id;
+                    `;
+    } else {
+        dbQuery = `
+                        SELECT review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at
+                        FROM reviews
+                        WHERE review_id = $1;
+                        `;
+    }
+
+    return db.query(dbQuery, [id])
     .then(({rows}) => {
+        console.log(rows, "<<< should be reviews by id")
         return rows[0]
     })
 }

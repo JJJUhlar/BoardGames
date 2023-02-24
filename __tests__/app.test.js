@@ -96,26 +96,28 @@ describe('appTests', () => {
 
 
         
-        test.skip('GET: 200 /api/reviews/:review_id?comment_count=true | Can use a query to get back comment counts for the given review', () => {
+        test('GET: 200 /api/reviews/:review_id?comment_count=true | Can use a query to get back comment counts for the given review', () => {
             return request(app)
                 .get('/api/reviews/3?comment_count=true')
                 .expect(200)
                 .then(({body}) => {
                     const review = body.review;
+                    console.log(body.review, "<<< should be review with 3 comments")
 
-                    expect(review.comments).toBe(3)
+                    expect(review.comment_count).toBe(3)
                 })
         })
         
         
-        test.skip('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
+        test('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
             return request(app)
                 .get('/api/reviews/1?comment_count=true')
                 .expect(200)
                 .then(({body})=>{
+                    console.log(body.review, "<<< should be review with no comments")
                     const review = body.review;
 
-                    expect(review.comments).toBe(0)
+                    expect(review.comment_count).toBe(0)
                 })
         })
 
@@ -259,7 +261,7 @@ describe('appTests', () => {
                 })
         })
         
-        test.skip('GET: 400 /api/reviews/:review_id?comment_count= | Errors if sent an invalid comment_count query ', () => {
+        test('GET: 400 /api/reviews/:review_id?comment_count=[object Object] | Errors if sent an invalid comment_count query ', () => {
             return request(app)
                 .get('/api/reviews/3?comment_count=undefinedNaN[object Object]')
                 .expect(400)
