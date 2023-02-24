@@ -4,6 +4,7 @@ const db = require('./db/connection')
 
 const {
     getUsers,
+    getEndPoints,
     getCategories,
     getReviews,
     getReviewByID,
@@ -32,7 +33,7 @@ app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
 app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 
 app.get("/api/users", getUsers)
-
+app.get("/api", getEndPoints)
 // error handlers
 app.use(handle404noPaths)
 app.use(handleCustomErrors)

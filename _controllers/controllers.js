@@ -91,3 +91,17 @@ exports.getUsers = (req,res,next) => {
             next(err)
         })
 }
+
+exports.getEndPoints = (req,res,next) => {
+    const endpoints =  {
+        "GET": "/api/categories",
+        "GET": "/api/reviews",
+        "GET": "/api/reviews/:review_id",
+        "GET": "/api/reviews/:review_id/comments",
+        "POST": "/api/reviews/:review_id/comments",
+        "DELETE": "/api/comments/:comment_id",
+        "PATCH": "/api/reviews/:review_id",
+        "GET": "/api/users"
+    }
+    res.status(200).json(endpoints)
+} 
