@@ -188,7 +188,7 @@ describe('appTests', () => {
                 .send(body)
                 .expect(201) // 'created'
                 .then(({body})=>{
-                    console.log(body.postedComment)
+                 
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
@@ -219,7 +219,7 @@ describe('appTests', () => {
                 .send(body)
                 .expect(201) // 'created'
                 .then(({body})=>{
-                    console.log(body.postedComment)
+                    
                     const post = body.postedComment;
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
@@ -238,12 +238,12 @@ describe('appTests', () => {
                 })
         })
 
-        test.skip('DELETE: 204 /api/comments/:comment_id deletes a comment given an id', () => {
+        test('DELETE: 204 /api/comments/:comment_id deletes a comment given an id', () => {
             return request(app)
                 .delete('/api/comments/1')
                 .expect(204)
-                .then(({body})=>{
-                    expect(body.msg).toBe('no content')
+                .then((data)=>{
+                    expect(data.res.statusMessage).toBe('No Content')
                 })
         })
     })
@@ -263,7 +263,7 @@ describe('appTests', () => {
                 .expect(400)
                 .then(({body})=>{
 
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
 
@@ -280,7 +280,7 @@ describe('appTests', () => {
                 .get('/api/reviews/magicErrorThrowingCatapult/comments')
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('GET: 404 /api/reviews/:well_formed_but_non_existant_id/comments', () => {
@@ -334,7 +334,7 @@ describe('appTests', () => {
                 .send(testComment)
                 .expect(400)
                 .then(({body}) => {
-                    expect(body.msg).toBe('Invalid Input: bad review ID')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('POST: 400 errors when required properties are missing, to a correct path', () => {
@@ -352,7 +352,7 @@ describe('appTests', () => {
                 })
         })
 
-        test.skip('DELETE: 404 /api/comments/:comment_id 404 errors if a comment does not exist', () => {
+        test('DELETE: 404 /api/comments/:comment_id 404 errors if a comment does not exist', () => {
             return request(app)
                 .delete('/api/comments/99999')
                 .expect(404)
@@ -361,7 +361,7 @@ describe('appTests', () => {
                 })
         })
 
-        test.skip('DELETE: 400 /api/comments/badRequest errors if a bad comment id is passed', () =>{
+        test('DELETE: 400 /api/comments/badRequest errors if a bad comment id is passed', () =>{
             return request(app)
                 .delete('/api/comments/undefinedNaN[object Object]')
                 .expect(400)

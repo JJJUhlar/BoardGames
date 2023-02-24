@@ -8,7 +8,8 @@ const {
     getReviews,
     getReviewByID,
     getReviewCommentsByID,
-    postCommentToReviewByID
+    postCommentToReviewByID,
+    deleteComment
 } = require('./_controllers/controllers')
 const {
     handle404noPaths,
@@ -34,7 +35,7 @@ app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 app.get("/api/users", getUsers)
 
 
-app.delete("/api/comments/:comment_id")
+app.delete("/api/comments/:comment_id", deleteComment)
 
 // error handlers
 app.use(handle404noPaths)
