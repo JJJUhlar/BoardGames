@@ -7,7 +7,8 @@ const {
     checkReviewExists,
     insertCommentToReviewByID,
     checkUserExists,
-    deleteSelectedComment
+    deleteSelectedComment,
+    retrieveEndpoints
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -52,7 +53,7 @@ exports.getReviewCommentsByID = (req,res,next) => {
 
     Promise.all([review_comments_promise, id_check_promise])
         .then((result) => {
-            res.status(200).send({"reviewComments": result[0]})
+            res.status(200).send({"comments": result[0]})
         })
         .catch((err)=>{
             next(err);
@@ -73,7 +74,7 @@ exports.postCommentToReviewByID = (req,res,next) => {
 
     Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
         .then((result) => {
-            res.status(201).send({"postedComment": result[0]})
+            res.status(201).send({"comment": result[0]})
         })
         .catch((err)=>{
             next(err)
@@ -91,17 +92,13 @@ exports.getUsers = (req,res,next) => {
 }
 
 exports.getEndPoints = (req,res,next) => {
-    const endpoints =  {
-        "GET": "/api/categories",
-        "GET": "/api/reviews",
-        "GET": "/api/reviews/:review_id",
-        "GET": "/api/reviews/:review_id/comments",
-        "POST": "/api/reviews/:review_id/comments",
-        "DELETE": "/api/comments/:comment_id",
-        "PATCH": "/api/reviews/:review_id",
-        "GET": "/api/users"
-    }
-    res.status(200).json(endpoints)
+    return retrieveEndpoints()
+        .then((data)=>{
+            res.status(200).json({"endpoints": data})
+        })
+        .catch((err)=>{
+            next(err)
+        })    
 } 
 
 exports.deleteComment = (req,res,next) => {
