@@ -16,13 +16,10 @@ exports.checkQueryParams = (category, sort_by, order) => {
 
 exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = 'created_at', order = 'DESC' ) => {
 
-    if (!['dexterity', "children's games", "social deduction", "euro game"].includes(category)) {
-        return Promise.reject({status: 400, msg: 'Bad Request: Invalid category '})
-    }
     if (!['ASC','DESC'].includes(order)) {
         return Promise.reject({status: 400, msg: 'Bad Request: Invalid order query'})
     }
-    if (!['review_id','owner','title','category','created_at','votes','designer','comment_count','review_img)url'].includes(sort_by)) {
+    if (!['review_id','owner','title','category','created_at','votes','designer','comment_count','review_img_url'].includes(sort_by)) {
         return Promise.reject({status: 400, msg: 'Bad Request: Invalid sort query'})
     }
 
@@ -36,17 +33,41 @@ exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = '
                 ORDER BY reviews.${sort_by} ${order};
                 `;
 
-    return db.query(query, [category])
-        .then(({rows, rowCount}) => {
-            
-            if (rowCount === 0) {
-                return Promise.reject({status: 404, msg: `No reviews found for this category: ${category}`})
-            }
-            rows.forEach((row)=>{
-                row.comment_count = parseInt(row.comment_count)
-            })
-            return rows
+    const check_category_promise = (category) => {
+        return db.query(`
+                        SELECT * FROM categories
+                        WHERE slug = $1;
+                        `,[category])
+                .then((data)=>{
+                    
+                    if (data.rowCount === 0) {
+                        return Promise.reject({status: 404, msg: `No reviews found for this category: ${category}`})
+                    }
+                    return category
+                })
+    }
+
+    const filtered_query_promise = () => {
+        return db
+                .query(query, [category])
+                .then(({rows, rowCount}) => {
+                    if (rowCount === 0) {
+                        return []
+                    }
+                    rows.forEach((row)=>{
+                        row.comment_count = parseInt(row.comment_count)
+                    })
+                    return rows
         })
+    }
+
+    return check_category_promise(category)
+                .then(()=>{
+                    return filtered_query_promise()
+                })
+                
+    // Promise.all([, ])
+    
 }
 
 exports.checkReviewExists = (id) => {

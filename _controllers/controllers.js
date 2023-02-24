@@ -20,7 +20,7 @@ exports.getCategories = (request, response, next) => {
 }
 
 exports.getReviews = (req,res,next) => {
-    const { category, sort_by, order } = req.query;
+    const { category, sort_by, order } = req.query; 
 
     return selectReviewsWithComCounts(category, sort_by, order)
         .then((reviews)=>{

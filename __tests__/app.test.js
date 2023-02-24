@@ -16,8 +16,6 @@ afterAll(()=>{
 })
 
 describe('appTests', () => {
-   
-
     describe('GET: /api/categories', () => {        
         test('GET: 200 /api/categories', () => {
             return request(app)
@@ -40,36 +38,36 @@ describe('appTests', () => {
     describe('GET: /api/reviews', () => {
         test('GET: 200 /api/reviews', () =>{
             return request(app)
-            .get('/api/reviews')
-            .expect(200)
-            .then(({body})=>{
-                expect(Array.isArray(body.reviews)).toBe(true)
-                expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
-                expect(Object.keys(body.reviews[0]).length).toBe(9)
-                body.reviews.forEach(review => {
-                    expect(review).toHaveProperty("owner", expect.any(String))
-                    expect(review).toHaveProperty("title", expect.any(String))
-                    expect(review).toHaveProperty("review_id", expect.any(Number))
-                    expect(review).toHaveProperty("category", expect.any(String))
-                    expect(review).toHaveProperty("review_img_url", expect.any(String))
-                    expect(review).toHaveProperty("created_at", expect.any(String))
-                    expect(review).toHaveProperty("votes", expect.any(Number))
-                    expect(review).toHaveProperty("designer", expect.any(String))
-                    expect(review).toHaveProperty("comment_count", expect.any(Number))
-                    })
+                .get('/api/reviews')
+                .expect(200)
+                .then(({body})=>{
+                    expect(Array.isArray(body.reviews)).toBe(true)
+                    expect(Object.prototype.toString.call(body.reviews[0])).toBe('[object Object]')
+                    expect(Object.keys(body.reviews[0]).length).toBe(9)
+                    body.reviews.forEach(review => {
+                        expect(review).toHaveProperty("owner", expect.any(String))
+                        expect(review).toHaveProperty("title", expect.any(String))
+                        expect(review).toHaveProperty("review_id", expect.any(Number))
+                        expect(review).toHaveProperty("category", expect.any(String))
+                        expect(review).toHaveProperty("review_img_url", expect.any(String))
+                        expect(review).toHaveProperty("created_at", expect.any(String))
+                        expect(review).toHaveProperty("votes", expect.any(Number))
+                        expect(review).toHaveProperty("designer", expect.any(String))
+                        expect(review).toHaveProperty("comment_count", expect.any(Number))
+                        })
+                    
+                    const reviewDates = body.reviews.map((review)=>{
+                            const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
                 
-                const reviewDates = body.reviews.map((review)=>{
-                        const date = review.created_at.substring(0,4) + review.created_at.substring(5,7) + review.created_at.substring(8,10)
-            
-                        return parseInt(date,10)
-                    });
+                            return parseInt(date,10)
+                        });
 
-                for (let i = 1; i < reviewDates.length; i++) {
-                    expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
-                    }
-                
-                });
-            })
+                    for (let i = 1; i < reviewDates.length; i++) {
+                        expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
+                        }
+                    
+                    });
+                })
         test('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
                 .get('/api/reviews?category=social+deduction&sort_by=title&order=ASC')
@@ -97,6 +95,17 @@ describe('appTests', () => {
                     expect(reviews).toBeSortedBy('created_at', {descending: true})
                 })
         })
+        test('GET 200: /api/reviews?query responds with an empty array of articles for a valid query with no reviews', () => {
+            return request(app)
+                .get("/api/reviews?category=children's+games")
+                .expect(200)
+                .then(({body})=>{
+                    const reviews = body.reviews;
+                    expect(reviews).toEqual([])
+                })
+                
+        })
+
         test('GET 200: /api/reviews?badlyformedquery Ignores a bad query, and returns default get reviews request.', () => {
             return request(app)
             .get('/api/reviews')
@@ -260,12 +269,12 @@ describe('appTests', () => {
             })
         })
 
-        test('GET: 404 /api/reviews? returns not found if there are no entries for the queried category', () => {
+        test('GET: 404 /api/reviews? returns not found if category does not exist', () => {
             return request(app)
-                .get("/api/reviews?category=children's+games")
+                .get("/api/reviews?category=pirates")
                 .expect(404)
                 .then(({body})=>{
-                    expect(body.msg).toBe("No reviews found for this category: children's games")
+                    expect(body.msg).toBe("No reviews found for this category: pirates")
                 })
             })
 
