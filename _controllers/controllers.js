@@ -1,4 +1,5 @@
 const {
+    selectUsers,
     selectCategories,
     selectReviewsWithComCounts,
     selectReviewByID,
@@ -74,6 +75,15 @@ exports.postCommentToReviewByID = (req,res,next) => {
         })
         .catch((err)=>{
             next(err)
+        })   
+}
+
+exports.getUsers = (req,res,next) => {
+    return selectUsers()
+        .then((usersList)=>{
+            res.status(200).send({"users": usersList})
         })
-    
+        .catch((err)=>{
+            next(err)
+        })
 }

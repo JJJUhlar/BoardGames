@@ -123,3 +123,10 @@ exports.insertCommentToReviewByID = (review_id, username, body) => {
             return rows[0];
         })
 }
+
+exports.selectUsers = () => {
+    return db.query(`SELECT * FROM users;`)
+        .then(({rows})=>{
+            return rows
+        })
+}
