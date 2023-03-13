@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('./db/connection')
+const cors = require('cors')
 // require controllers
 
 const {
@@ -23,6 +24,7 @@ const app = express()
 
 
 // add app.use json here
+app.use(cors())
 app.use(express.json())
 
 // end points
