@@ -11,7 +11,8 @@ const {
     getReviewByID,
     getReviewCommentsByID,
     postCommentToReviewByID,
-    deleteComment
+    deleteComment,
+    updateReviewVotes
 } = require('./_controllers/controllers')
 const {
     handle404noPaths,
@@ -33,8 +34,9 @@ app.get("/api/reviews", getReviews)
 app.get("/api/reviews/:review_id", getReviewByID)
 app.get("/api/reviews/:review_id/comments", getReviewCommentsByID)
 
-app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 
+app.patch("/api/reviews/:review_id", updateReviewVotes)
+app.post("/api/reviews/:review_id/comments", postCommentToReviewByID)
 app.get("/api/users", getUsers)
 app.get("/api", getEndPoints)
 

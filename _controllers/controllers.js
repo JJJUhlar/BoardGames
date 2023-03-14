@@ -8,7 +8,8 @@ const {
     insertCommentToReviewByID,
     checkUserExists,
     deleteSelectedComment,
-    retrieveEndpoints
+    retrieveEndpoints,
+    insertNewVotes
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -111,4 +112,25 @@ exports.deleteComment = (req,res,next) => {
         .catch((err)=>{
             next(err)
         })
+}
+
+exports.updateReviewVotes = (req,res,next) => {
+    const { review_id } = req.params;
+    const { inc_votes } = req.body;
+
+    if (!inc_votes) {
+        next({status: 400, msg: "Invalid Input: missing inc_votes"})
+    }
+
+    
+    return insertNewVotes(review_id, inc_votes)
+        .then((result) => {
+
+            res.status(202).send({"updatedReview": result})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+        
+
 }
