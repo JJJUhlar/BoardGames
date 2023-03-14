@@ -7,7 +7,9 @@ const {
     checkReviewExists,
     insertCommentToReviewByID,
     checkUserExists,
-    deleteSelectedComment
+    deleteSelectedComment,
+    retrieveEndpoints,
+    insertNewVotes
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -54,7 +56,7 @@ exports.getReviewCommentsByID = (req,res,next) => {
 
     Promise.all([review_comments_promise, id_check_promise])
         .then((result) => {
-            res.status(200).send({"reviewComments": result[0]})
+            res.status(200).send({"comments": result[0]})
         })
         .catch((err)=>{
             next(err);
@@ -75,7 +77,7 @@ exports.postCommentToReviewByID = (req,res,next) => {
 
     Promise.all([insert_post_promise, review_id_check_promise, check_user_exists_promise])
         .then((result) => {
-            res.status(201).send({"postedComment": result[0]})
+            res.status(201).send({"comment": result[0]})
         })
         .catch((err)=>{
             next(err)
@@ -92,6 +94,16 @@ exports.getUsers = (req,res,next) => {
         })
 }
 
+exports.getEndPoints = (req,res,next) => {
+    return retrieveEndpoints()
+        .then((data)=>{
+            res.status(200).json({"endpoints": data})
+        })
+        .catch((err)=>{
+            next(err)
+        })    
+} 
+
 exports.deleteComment = (req,res,next) => {
     const { comment_id } = req.params
 
@@ -102,4 +114,25 @@ exports.deleteComment = (req,res,next) => {
         .catch((err)=>{
             next(err)
         })
+}
+
+exports.updateReviewVotes = (req,res,next) => {
+    const { review_id } = req.params;
+    const { inc_votes } = req.body;
+
+    if (!inc_votes) {
+        next({status: 400, msg: "Invalid Input: missing inc_votes"})
+    }
+
+    
+    return insertNewVotes(review_id, inc_votes)
+        .then((result) => {
+
+            res.status(202).send({"updatedReview": result})
+        })
+        .catch((err)=>{
+            next(err)
+        })
+        
+
 }

@@ -1,5 +1,6 @@
 const db = require('../db/connection')
 const { sort } = require('../db/data/test-data/categories')
+const fs = require('fs/promises')
 
 exports.selectCategories = () => { 
     return db.query('SELECT * FROM categories;')
@@ -118,6 +119,22 @@ exports.selectReviewByID = (id) => {
     })
 }
 
+exports.insertNewVotes = (id, votesToAdd) =>{
+    return db.query(`
+                    UPDATE reviews
+                    SET votes = votes + $2
+                    WHERE review_id = $1
+                    RETURNING *;
+                    `, [id, votesToAdd])
+        .then(({rows, rowCount}) => {
+            
+            if (rowCount === 0) {
+                return Promise.reject({status: 404, msg: `No review found for this ID: ${id}`})
+            }
+            return rows[0]
+        })       
+}
+
 exports.checkUserExists = (username) => {
     return db.query(`
                     SELECT *
@@ -170,4 +187,9 @@ exports.deleteSelectedComment = (comment_id) => {
                 }
                 return rows[0]
             })
+}
+
+exports.retrieveEndpoints = () =>{ 
+    return fs.readFile('endpoints.json','utf-8')
+        
 }

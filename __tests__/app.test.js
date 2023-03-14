@@ -23,18 +23,16 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body}) => {
                     const {categories} = body;
-
                     expect(Array.isArray(categories)).toBe(true)
-
                     categories.forEach((category)=>{
                         expect(Object.keys(category).length).toBe(2)
-
                         expect(category).toHaveProperty('slug', expect.any(String));
                         expect(category).toHaveProperty('description', expect.any(String));
-                    })
                 })
+            })
         })
     })
+
     describe('GET: /api/reviews', () => {
         test('GET: 200 /api/reviews', () =>{
             return request(app)
@@ -65,8 +63,7 @@ describe('appTests', () => {
                     for (let i = 1; i < reviewDates.length; i++) {
                         expect(reviewDates[i - 1] >= reviewDates[i]).toBe(true)
                         }
-                    
-                    });
+                        });
                 })
         test('GET 200 /api/reviews accepts a category query, sort_by query, and order_query', () => {
             return request(app)
@@ -125,6 +122,7 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const review = body.review;
+                    
 
                     expect(Object.prototype.toString.call(review)).toBe('[object Object]')
 
@@ -139,7 +137,7 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('owner', expect.any(String))
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
-        })
+            })
 
 
         
@@ -154,7 +152,7 @@ describe('appTests', () => {
         })
         
         
-        test('GET: 200 /api/reviews/:review_id?comment_count=true | returns 0 for comment count if there are no comments', () => {
+        test('GET: 200 /api/reviews/:review_id | returns 0 for comment count if there are no comments', () => {
             return request(app)
                 .get('/api/reviews/1')
                 .expect(200)
@@ -170,7 +168,8 @@ describe('appTests', () => {
                 .get('/api/reviews/3/comments')
                 .expect(200)
                 .then(({body})=>{
-                    const comments = body.reviewComments;
+                    const comments = body.comments;
+                    
                     expect(Array.isArray(comments)).toBe(true)
                     expect(Object.prototype.toString.call(comments[0])).toBe('[object Object]');
     
@@ -183,7 +182,7 @@ describe('appTests', () => {
                         expect(comment).toHaveProperty('body', expect.any(String))
                         expect(comment).toHaveProperty('review_id', expect.any(Number))
                     })
-                    // should return in descending order (most recent first)
+
                     for (let i = 1; i < comments.length; i++) {
                         expect(Date.parse(comments[i-1].created_at) > Date.parse(comments[i].created_at)).toBe(true)
                     }
@@ -195,10 +194,80 @@ describe('appTests', () => {
                 .get('/api/reviews/5/comments')
                 .expect(200)
                 .then(({body})=>{
-                    const comments = body.reviewComments;
+                    const comments = body.comments;
                     expect(Array.isArray(comments)).toBe(true)
                     expect(comments.length).toBe(0)
                 })
+        })
+        test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
+            return request(app)
+                .get('/api/reviews/5/comments')
+                .expect(200)
+                .then(({body})=>{
+                    const comments = body.comments;
+                    expect(Array.isArray(comments)).toBe(true)
+                    expect(comments.length).toBe(0)
+                })
+        })
+    })
+
+    describe('PATCH 202 /api/reviews/:review_id', () => {
+        test('increments votes for a review by a given amount ', () => {
+            const testPatch = {
+                "inc_votes": 5 
+            }
+
+            return request(app)
+                .patch('/api/reviews/2')
+                .send(testPatch)
+                .expect(202)
+                .then(({body}) => {
+                    console.log(body.updatedReview, "<<< should have returned updated review")
+                    expect(body.updatedReview.votes).toBe(10)
+
+                    expect(Object.prototype.toString.call(body.updatedReview)).toBe('[object Object]')
+
+                    expect(Object.keys(body.updatedReview).length).toBe(9)
+                    expect
+
+                    expect(body.updatedReview).toHaveProperty('review_id',2)
+                    expect(body.updatedReview).toHaveProperty('title',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('category',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('designer',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('owner',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('review_body',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('review_img_url',expect.any(String))
+                    expect(body.updatedReview).toHaveProperty('created_at',expect.any(String))
+                    
+                })
+        })
+        test('decrements votes for a review by a specified amount', () => {
+            const testPatch = {
+                "inc_votes": -5 
+            }
+
+            return request(app)
+                .patch('/api/reviews/9')
+                .send(testPatch)
+                .expect(202)
+                .then(({body}) => {
+                    expect(body.updatedReview.votes).toBe(5)
+                })
+        })
+        test('ignores unncessary properties', () => {
+            const testPatch = {
+                "inc_votes": 9,
+                "Extra property 1": "asldkjad",
+                "Extra property 2": [12,3,,4,5,,6] 
+            }
+
+            return request(app)
+                .patch('/api/reviews/1')
+                .send(testPatch)
+                .expect(202)
+                .then(({body}) => {
+                    expect(body.updatedReview.votes).toBe(10)
+            })
         })
     })
 
@@ -209,6 +278,8 @@ describe('appTests', () => {
                 .expect(200)
                 .then(({body})=>{
                     const users = body.users
+
+                   
                     expect(Array.isArray(users)).toBe(true)
                     expect(Object.prototype.toString.call(users[0])).toBe('[object Object]')
 
@@ -233,10 +304,12 @@ describe('appTests', () => {
             return request(app)
                 .post('/api/reviews/1/comments')
                 .send(body)
-                .expect(201) // 'created'
+                .expect(201) 
                 .then(({body})=>{
                  
-                    const post = body.postedComment;
+                    const post = body.comment;
+
+                    
 
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
                     expect(Object.keys(post).length).toBe(6)
@@ -253,6 +326,7 @@ describe('appTests', () => {
 
                 })
         })
+
         test('POST: 201 | ignores unnecessary properties', () => {
             const body = {
                 "username": 'bainesface',
@@ -264,27 +338,49 @@ describe('appTests', () => {
             return request(app)
                 .post('/api/reviews/1/comments')
                 .send(body)
-                .expect(201) // 'created'
+                .expect(201) 
                 .then(({body})=>{
-                    
-                    const post = body.postedComment;
-
+                    const post = body.comment;
                     expect(Object.prototype.toString.call(post)).toBe('[object Object]')
                     expect(Object.keys(post).length).toBe(6)
-                    
                     expect(post).toHaveProperty("comment_id", expect.any(Number))
                     expect(post).toHaveProperty("body", expect.any(String))
                     expect(post).toHaveProperty("review_id", expect.any(Number))
                     expect(post).toHaveProperty("author", expect.any(String))
                     expect(post).toHaveProperty("votes", expect.any(Number))
                     expect(post).toHaveProperty("created_at", expect.any(String))
-
                     expect(post.author).toBe("bainesface")
                     expect(post.body).toBe("I think this test game is amazing")
+                })
+        })
+    })
+
+    describe('GET /api', () => {
+        test('GET: 200 /api responds with json of all available endpoints', () => {
+            return request(app)
+                .get('/api')
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .then(({body}) => {
+                    
+                    const endpoints = JSON.parse(body.endpoints)
+                
+                    
+
+                    expect(endpoints).toHaveProperty("GET /api")
+                    expect(endpoints).toHaveProperty("GET /api/reviews")
+                    expect(endpoints).toHaveProperty("GET /api/reviews/:review_id")
+                    expect(endpoints).toHaveProperty("GET /api/reviews/:review_id/comments")
+                    expect(endpoints).toHaveProperty("POST /api/reviews/:review_id/comments")
+                    expect(endpoints).toHaveProperty("DELETE /api/comments/:comment_id")
+                    expect(endpoints).toHaveProperty("GET /api/users")
+                    expect(endpoints).toHaveProperty("PATCH /api/reviews/:review_id")
 
                 })
         })
-
+    })
+    
+    describe('DELETE /api/comments/:comment_id', () => {
         test('DELETE: 204 /api/comments/:comment_id deletes a comment given an id', () => {
             return request(app)
                 .delete('/api/comments/1')
@@ -294,8 +390,10 @@ describe('appTests', () => {
                 })
         })
     })
-    
-    describe('errors', () => {
+
+          
+
+    describe('Errors', () => {
         test('responds 404 to non existent path', () => {
             return request(app)
                 .get('/api/notanexistingendpoint')
@@ -340,6 +438,7 @@ describe('appTests', () => {
                 .then(({body})=>{
 
                     expect(body.msg).toBe('Invalid Input: bad request')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
 
@@ -357,6 +456,7 @@ describe('appTests', () => {
                 .expect(400)
                 .then(({body}) => {
                     expect(body.msg).toBe('Invalid Input: bad request')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('GET: 404 /api/reviews/:well_formed_but_non_existant_id/comments', () => {
@@ -368,6 +468,59 @@ describe('appTests', () => {
                 })
         })
             // /api/reviews/review_id/comments 
+        
+        test('PATCH: 404 /api/reviews/:non_existant_review_id | errors for a well_formed for but non-existant review', () => {
+            const testPatch = {
+                "inc_votes": -5 
+            }
+
+            return request(app)
+                .patch('/api/reviews/99999')
+                .send(testPatch)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.msg).toBe('No review found for this ID: 99999')
+                })
+        })
+        test('PATCH: 400 /api/reviews/:not_a_valid_review_id | errors for a valid patch, but to a bad path', () => {
+            const testPatch = {
+                "inc_votes": -5 
+            }
+
+            return request(app)
+                .patch('/api/reviews/not_a_valid_path')
+                .send(testPatch)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad request')
+                })
+        })
+        test('PATCH: 400 /api/reviews/:review_id | errors for a malformed patch request to a valid review_id', () => {
+            const testPatch = {
+                "inc_votes": "What happens if I'm *not* an integer!" 
+            }
+
+            return request(app)
+                .patch('/api/reviews/1')
+                .send(testPatch)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: bad request')
+                })
+        })
+        test('PATCH: 400 /api/reviews/:review_id | errors for a well formed request but missing necessary properties', () => {
+            const testPatch = {
+                "not inc votes": "I should break your test" 
+            }
+
+            return request(app)
+                .patch('/api/reviews/1')
+                .send(testPatch)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.msg).toBe('Invalid Input: missing inc_votes')
+                })
+        })
         test('POST: 404 /api/reviews/:review_id/comments Rejects a well formed post to an existing review however for a non-existant user.', () => {
 
             const testComment = {
@@ -411,6 +564,7 @@ describe('appTests', () => {
                 .expect(400)
                 .then(({body}) => {
                     expect(body.msg).toBe('Invalid Input: bad request')
+                    expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
         test('POST: 400 errors when required properties are missing, to a correct path', () => {
@@ -445,6 +599,5 @@ describe('appTests', () => {
                     expect(body.msg).toBe('Invalid Input: bad request')
                 })
         })
-
     })
 })
