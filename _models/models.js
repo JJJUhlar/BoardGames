@@ -34,6 +34,8 @@ exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = '
                 ORDER BY reviews.${sort_by} ${order};
                 `;
 
+    
+    
     const check_category_promise = (category) => {
         return db.query(`
                         SELECT * FROM categories

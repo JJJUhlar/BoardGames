@@ -75,7 +75,7 @@ describe('appTests', () => {
                     expect(Array.isArray(reviews)).toBe(true)
                     expect(Object.prototype.toString.call(reviews[0])).toBe('[object Object]')
 
-                    // expect(reviews).toBeSortedBy('title', {descending: false})
+                    expect(reviews).toBeSortedBy('title', {descending: false})
 
                     reviews.forEach((review) => {
                         expect(review.category).toBe('social deduction')
@@ -89,7 +89,7 @@ describe('appTests', () => {
                 .then(({body})=>{
                     const reviews = body.reviews;
 
-                    // expect(reviews).toBeSortedBy('created_at', {descending: true})
+                    expect(reviews).toBeSortedBy('created_at', {descending: true})
                 })
         })
         test('GET 200: /api/reviews?query responds with an empty array of articles for a valid query with no reviews', () => {
@@ -222,7 +222,6 @@ describe('appTests', () => {
                 .send(testPatch)
                 .expect(202)
                 .then(({body}) => {
-                    console.log(body.updatedReview, "<<< should have returned updated review")
                     expect(body.updatedReview.votes).toBe(10)
 
                     expect(Object.prototype.toString.call(body.updatedReview)).toBe('[object Object]')
@@ -467,7 +466,6 @@ describe('appTests', () => {
                     expect(body.msg).toBe('No review found for this ID: 99999990')
                 })
         })
-            // /api/reviews/review_id/comments 
         
         test('PATCH: 404 /api/reviews/:non_existant_review_id | errors for a well_formed for but non-existant review', () => {
             const testPatch = {
