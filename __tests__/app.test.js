@@ -160,16 +160,6 @@ describe('appTests', () => {
                     expect(comments.length).toBe(0)
                 })
         })
-        test('GET: 200 /api/reviews/:review_id/comments | returns an empty array for an existing review_id with no comments', () => {
-            return request(app)
-                .get('/api/reviews/5/comments')
-                .expect(200)
-                .then(({body})=>{
-                    const comments = body.reviewComments;
-                    expect(Array.isArray(comments)).toBe(true)
-                    expect(comments.length).toBe(0)
-                })
-        })
     })
 
     describe('PATCH 202 /api/reviews/:review_id', () => {
