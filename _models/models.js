@@ -15,6 +15,36 @@ exports.checkQueryParams = (category, sort_by, order) => {
         .then(({rows}))
 }
 
+exports.selectAllReviews = (sort_by = 'created_at', order = 'DESC' ) => {
+    
+    if (!['ASC','DESC'].includes(order)) {
+        return Promise.reject({status: 400, msg: 'Bad Request: Invalid order query'})
+    }
+    if (!['review_id','owner','title','category','created_at','votes','designer','comment_count','review_img_url'].includes(sort_by)) {
+        return Promise.reject({status: 400, msg: 'Bad Request: Invalid sort query'})
+    }
+
+    let query = `
+                SELECT reviews.review_id, reviews.owner, reviews.title, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer,  COUNT(comments.body) AS comment_count
+                FROM comments
+                RIGHT JOIN reviews
+                ON comments.review_id = reviews.review_id
+                GROUP BY reviews.review_id
+                ORDER BY reviews.${sort_by} ${order};
+                `
+
+    return db.query(query)
+            .then(({rows, rowCount}) => {
+                if (rowCount === 0) {
+                    return []
+                }
+                rows.forEach((row)=>{
+                    row.comment_count = parseInt(row.comment_count)
+                })
+                return rows
+        })
+}
+
 exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = 'created_at', order = 'DESC' ) => {
 
     if (!['ASC','DESC'].includes(order)) {

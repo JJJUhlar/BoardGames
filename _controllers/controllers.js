@@ -9,7 +9,8 @@ const {
     checkUserExists,
     deleteSelectedComment,
     retrieveEndpoints,
-    insertNewVotes
+    insertNewVotes,
+    selectAllReviews
 } = require('../_models/models')
 
 exports.getCategories = (request, response, next) => {
@@ -24,6 +25,16 @@ exports.getCategories = (request, response, next) => {
 
 exports.getReviews = (req,res,next) => {
     const { category, sort_by, order } = req.query; 
+
+    if (category === undefined) {
+        return selectAllReviews(sort_by,order)
+            .then((reviews)=>{
+                res.status(200).send({"reviews": reviews})
+            })
+            .catch((err)=>{
+                next(err);
+            })
+    }
 
     return selectReviewsWithComCounts(category, sort_by, order)
         .then((reviews)=>{
