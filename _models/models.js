@@ -1,6 +1,7 @@
 const db = require('../db/connection')
 const { sort } = require('../db/data/test-data/categories')
 const fs = require('fs/promises')
+const e = require('express')
 
 exports.selectCategories = () => { 
     return db.query('SELECT * FROM categories;')
@@ -129,8 +130,12 @@ exports.selectReviewCommentsByID = (id) => {
                     WHERE review_id = $1
                     ORDER BY created_at DESC;
                     `, [id])
-        .then(({rows})=>{
-            return rows
+        .then(({rows, rowCount})=>{
+            if (rowCount === 0) {
+                return Promise.reject({status: 404, msg: `No review found with this id: ${id}`})
+            } else {
+                return rows
+            }
         })
     }
 
