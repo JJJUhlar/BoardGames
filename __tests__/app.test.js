@@ -138,6 +138,7 @@ describe('appTests', () => {
                     expect(review).toHaveProperty('created_at', expect.any(String))
                 })
             })
+        
 
 
         
@@ -438,6 +439,14 @@ describe('appTests', () => {
 
                     expect(body.msg).toBe('Invalid Input: bad request')
                     expect(body.msg).toBe('Invalid Input: bad request')
+                })
+        })
+        test('GET: 404 /api/reviews/:review_id for a valid but non-exiting reviews', () => {
+            return request(app)
+                .get('/api/reviews/999999999999')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('No review found with this id')
                 })
         })
 
