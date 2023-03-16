@@ -130,12 +130,10 @@ exports.selectReviewCommentsByID = (id) => {
                     WHERE review_id = $1
                     ORDER BY created_at DESC;
                     `, [id])
-        .then(({rows, rowCount})=>{
-            if (rowCount === 0) {
-                return Promise.reject({status: 404, msg: `No review found with this id: ${id}`})
-            } else {
+        .then(({rows})=>{
+           
                 return rows
-            }
+            
         })
     }
 
@@ -151,8 +149,12 @@ exports.selectReviewByID = (id) => {
                 `;
 
     return db.query(dbQuery, [id])
-    .then(({rows}) => {
-        return rows[0]
+    .then((res) => {
+        if (res.rowCount === 0) {
+            return Promise.reject({status: 404, msg: `No review found with this id: ${id}`})
+        } else {
+            return res.rows[0]
+        }
     })
 }
 
