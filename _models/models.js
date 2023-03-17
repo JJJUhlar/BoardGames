@@ -62,7 +62,7 @@ exports.selectReviewsWithComCounts = (category = 'social deduction', sort_by = '
                 ON comments.review_id = reviews.review_id
                 WHERE category = $1
                 GROUP BY reviews.review_id
-                ORDER BY reviews.${sort_by} ${order};
+                ORDER BY ${sort_by} ${order};
                 `;
 
     
