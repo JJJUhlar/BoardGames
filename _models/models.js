@@ -31,7 +31,7 @@ exports.selectAllReviews = (sort_by = 'created_at', order = 'DESC' ) => {
                 RIGHT JOIN reviews
                 ON comments.review_id = reviews.review_id
                 GROUP BY reviews.review_id
-                ORDER BY reviews.${sort_by} ${order};
+                ORDER BY ${sort_by} ${order};
                 `
 
     return db.query(query)
